@@ -1,0 +1,34 @@
+version: '3'
+services:
+  sprint06_auth_pg:
+    image: postgres:15.0-alpine
+    volumes:
+      - sprint06_auth_pg01data:/var/lib/postgresql/data/
+      - ./auth_api/db/db-init-scripts/create_db.sql:/docker-entrypoint-initdb.d/create_db.sql
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $POSTGRES_DB -U $POSTGRES_USER"]
+      interval: 3s
+      timeout: 20s
+      retries: 5
+      start_period: 80s
+    
+  sprint06_auth_pgadmin:
+    image: dpage/pgadmin4:latest
+    env_file:
+      - ./.env
+    ports:
+      - '7777:80'
+
+  sprint06_auth_redis:
+    image: redis:latest
+    volumes:
+      - sprint06_auth_redis01data:/data:rw
+
+    command: >
+      --save 60 1
+
+volumes:
+  sprint06_auth_pg01data:
+  sprint06_auth_redis01data:
