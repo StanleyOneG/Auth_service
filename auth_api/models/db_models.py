@@ -1,3 +1,5 @@
+from werkzeug.security import (generate_password_hash,
+                               check_password_hash)
 from sqlalchemy import (create_engine,
                         Column,
                         ForeignKey,
@@ -40,6 +42,12 @@ class User(Base):
     login_history = relationship('UserLoginHistory', back_populates='user', order_by='UserLoginHistory.login_at.desc()')
 
     __table_args__ = (UniqueConstraint('login', 'email'),)
+
+    def set_password(self, password:str) -> None:
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password:str) -> None:
+        return check_password_hash(self.password, password)
 
 
 class UserInfo(Base):
