@@ -23,7 +23,6 @@ engine = create_engine(DB_URI)
 
 with engine.connect() as conn:
     if not conn.dialect.has_schema(conn, POSTGRES_SCHEMA_NAME):
-        stmt = f"CREATE SCHEMA {POSTGRES_SCHEMA_NAME}"
         conn.execute(schema.CreateSchema(POSTGRES_SCHEMA_NAME, True))
         conn.commit()
 
