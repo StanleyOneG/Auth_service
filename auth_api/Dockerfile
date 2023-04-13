@@ -13,3 +13,6 @@ RUN \
 
 WORKDIR /auth_api
 
+EXPOSE 8000
+
+CMD alembic upgrade head && python main.py
