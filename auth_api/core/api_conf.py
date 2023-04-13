@@ -6,75 +6,75 @@ from pydantic import BaseSettings
 load_dotenv()
 
 
-def to_lower(value: str) -> str:
-    """Helper to convert env variables to lower case
+def to_upper(value: str) -> str:
+    """Helper to convert env variables to upper case
 
     Args:
-        value: str - string to be converted to lower case
+        value: str - string to be converted to upper case
 
     Returns:
-        converted to lower case value
+        converted to upper case value
     """
-    return value.lower()
+    return value.upper()
 
 
 class DatabaseSettings(BaseSettings):
-    ENGINE: str
+    engine: str
 
     class Config:
         """Configuration class for correct env variables insertion."""
 
         env_prefix = 'DB_'
-        alias_generator = to_lower
+        alias_generator = to_upper
 
 
 class PgAdminSettings(BaseSettings):
-    DEFAULT_EMAIL: str
-    DEFAULT_PASSWORD: str
+    default_email: str
+    default_password: str
 
     class Config:
         """Configuration class for correct env variables insertion."""
 
         env_prefix = 'PGADMIN_'
-        alias_generator = to_lower
+        alias_generator = to_upper
 
 
 class PostgresSettings(BaseSettings):
     """Configuration for Postgresql."""
 
-    HOST: str 
-    PORT: int
-    USERNAME: str
-    PASSWORD: str
-    DB_NAME: str
-    SCHEMA_NAME: str
-    OPTIONS: str
+    host: str
+    port: int
+    user: str
+    password: str
+    db: str
+    schema_name: str
+    options: str
 
     class Config:
         """Configuration class for correct env variables insertion."""
 
         env_prefix = 'POSTGRES_'
-        alias_generator = to_lower
+        alias_generator = to_upper
 
 
 class RedisSettings(BaseSettings):
     """Configuration for Redis."""
 
-    HOST: str
-    PORT: int
-    EXPIRE: int
+    host: str
+    port: int
+    expire: int
 
     class Config:
         """Configuration class for correct env variables insertion."""
 
         env_prefix = 'REDIS_'
-        alias_generator = to_lower
+        alias_generator = to_upper
 
 
 class Settings(BaseSettings):
     """Helper class for configuration access."""
 
-    DATABASE = DatabaseSettings()
-    REDIS = RedisSettings()
-    PGADMIN = PgAdminSettings()
-    POSTGRES = PostgresSettings()
+    database = DatabaseSettings()
+    redis = RedisSettings()
+    pgadmin = PgAdminSettings()
+    postgres = PostgresSettings()
