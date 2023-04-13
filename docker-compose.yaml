@@ -20,8 +20,11 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - sprint06_auth_pg
-    command: bash -c "alembic upgrade head"
+      sprint06_auth_pg:
+        condition: service_healthy
+    ports:
+      - 8000:8000
+    # command: bash -c "alembic upgrade head"
     
   sprint06_auth_pgadmin:
     image: dpage/pgadmin4:latest
