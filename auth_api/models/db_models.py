@@ -30,6 +30,13 @@ metadata_obj = MetaData(schema=POSTGRES_SCHEMA_NAME)
 Base = declarative_base(metadata=metadata_obj)
 
 
+class UserPermission(Base):
+    __tablename__ = 'user_permission'
+    id = Column(UUID(as_uuid=True), primary_key=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    permission_id = Column(UUID(as_uuid=True), ForeignKey('permission.id', ondelete='CASCADE'), nullable=False)
+
+    __table_args__ = (UniqueConstraint('user_id', 'permission_id'),)
 class User(Base):
     __tablename__ = 'user'
     id = Column(UUID(as_uuid=True), primary_key=True)
@@ -37,7 +44,7 @@ class User(Base):
     email = Column(Text, nullable=False)
     password = Column(String, nullable=False)
     user_info = relationship('UserInfo', back_populates='user', uselist=False)
-    permissions = relationship('Permission', secondary='user_permission', back_populates='users')
+    permissions = relationship('UserPermission')
     login_history = relationship('UserLoginHistory', back_populates='user', order_by='UserLoginHistory.login_at.desc()')
 
     __table_args__ = (UniqueConstraint('login', 'email'),)
@@ -63,16 +70,9 @@ class Permission(Base):
     __tablename__ = 'permission'
     id = Column(UUID(as_uuid=True), primary_key=True)
     name = Column(Text, nullable=False, unique=True)
-    user = relationship('User', secondary='user_permission', back_populates='permissions')
+    # user = relationship('User', secondary='user_permission', back_populates='permissions')
 
 
-class UserPermission(Base):
-    __tablename__ = 'user_permission'
-    id = Column(UUID(as_uuid=True), primary_key=True)
-    user_id = Column(UUID(as_uuid=True), ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    permission_id = Column(UUID(as_uuid=True), ForeignKey('permission.id', ondelete='CASCADE'), nullable=False)
-
-    __table_args__ = (UniqueConstraint('user_id', 'permission_id'),)
 
 
 class UserLoginHistory(Base):

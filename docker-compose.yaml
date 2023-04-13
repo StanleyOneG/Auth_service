@@ -19,6 +19,9 @@ services:
     build: ./auth_api
     env_file:
       - ./.env
+    # volumes:
+    #   - ./auth_api:/auth_api:rw
+    tty: true
     depends_on:
       sprint06_auth_pg:
         condition: service_healthy
