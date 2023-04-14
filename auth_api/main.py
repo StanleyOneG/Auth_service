@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from api.v1.sign_up import UserSignUp
+from api.v1.login import UserLogIn
 from core.config import DB_URI
 from core.jwt_management import jwt
 from cryptography.hazmat.backends import default_backend
@@ -57,6 +58,7 @@ class TestHelloWorld(Resource):
 
 api.add_resource(TestHelloWorld, '/hello')
 api.add_resource(UserSignUp, '/register')
+api.add_resource(UserLogIn, '/login')
 
 if __name__ == "__main__":
     app.run(

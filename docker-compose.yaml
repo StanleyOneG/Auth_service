@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   sprint06_auth_pg:
     image: postgres:15.0-alpine
@@ -19,8 +19,8 @@ services:
     build: ./auth_api
     env_file:
       - ./.env
-    # volumes:
-    #   - ./auth_api:/auth_api:rw
+    volumes:
+      - ./auth_api:/auth_api:rw
     tty: true
     depends_on:
       sprint06_auth_pg:

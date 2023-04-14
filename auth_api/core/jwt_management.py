@@ -31,17 +31,27 @@ def user_lookup_callback(_jwt_header, jwt_data):
     ).scalar_one()
 
 
-class JWTHandler(BaseJWT):
-    @staticmethod
-    def create_jwt_tokens(user: User, *args, **kwargs):
-        role = [permission.name for permission in user.permissions]
-        additional_claims = {'role': role}
+def create_token_pair(user: User, fresh_access_token: bool = False):
+    role = [permission.name for permission in user.permissions]
+    additional_claims = {'role': role}
+    if fresh_access_token:
         access_token = create_access_token(
             identity=user.id,
             additional_claims=additional_claims,
+            fresh=True,
         )
-        refresh_token = create_refresh_token(identity=user.id)
-        return access_token, refresh_token
+    access_token = create_access_token(
+        identity=user.id,
+        additional_claims=additional_claims,
+    )
+    refresh_token = create_refresh_token(identity=user.id)
+    return access_token, refresh_token
+
+
+class JWTHandler(BaseJWT):
+    @staticmethod
+    def create_jwt_tokens(user: User, *args, **kwargs):
+        return create_token_pair(user=user)
 
     @staticmethod
     @jwt_required(refresh=True)
@@ -53,6 +63,8 @@ class JWTHandler(BaseJWT):
             additional_claims=additional_claims,
             fresh=False,
         )
-        # response = jsonify({'message': 'Access token refreshed successfully'})
-        # set_access_cookies(response, access_token)
         return access_token
+
+    @staticmethod
+    def create_login_access_token(user: User, *args, **kwargs):
+        return create_token_pair(user=user, fresh_access_token=True)

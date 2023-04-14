@@ -39,7 +39,7 @@ class UserSignUp(Resource):
             db.session.add(new_user)
             db.session.commit()
             access_token, refresh_token = JWTHandler.create_jwt_tokens(
-                new_user
+                new_user,
             )
             response = jsonify({'message': 'User sign up successfull'})
             set_access_cookies(
