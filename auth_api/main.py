@@ -96,6 +96,9 @@ def create_superuser():
         password=SUPERUSER_PASSWORD,
     )
     db_user.id = uuid.uuid4()
+    db_user.login = SUPERUSER_LOGIN
+    db_user.email = SUPERUSER_EMAIL
+    db_user.set_password(SUPERUSER_PASSWORD)
     session.add(db_user)
     session.commit()
     logger.info("Superuser created")
