@@ -20,6 +20,33 @@ class UserSignUp(Resource):
     parser.add_argument('login', type=str, required=True, location='form')
 
     def post(self):
+        """
+        Регистрация нового пользователя
+        Запись в базу данных и выдача пары access token и refresh token
+        ---
+        parameters:
+          - in: formData
+            name: email
+            type: string
+            required: true
+          - in: formData
+            name: login
+            type: string
+            required: true
+          - in: formData
+            name: password
+            type: string
+            required: true
+        tags:
+          - Регистрация пользователя
+        produces:
+          - application/json
+        security:
+          - JWT: []
+        responses:
+          200:
+            description: Пользователь успешно зарегистрирован
+        """
         data = self.parser.parse_args()
         email = data['email']
         login = data['login']

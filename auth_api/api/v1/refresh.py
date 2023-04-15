@@ -13,6 +13,20 @@ from flask_restful import Resource
 class Refresh(Resource):
     @jwt_required(refresh=True)
     def post(self):
+        """
+        Обновление токенов access token и refresh token
+        ---
+        responses:
+          200:
+            description: A single user item
+        tags:
+          - Обновление токенов
+        security:
+          - JWT: []
+        responses:
+          200:
+            description: access token и refresh token успешно обновлены
+        """
         user = get_current_user()
         JWTHandler.revoke_access_token()
         JWTHandler.revoke_refresh_token()

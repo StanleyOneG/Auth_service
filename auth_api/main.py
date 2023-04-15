@@ -15,11 +15,19 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from flask_jwt_extended import jwt_required
 from datetime import timedelta
 
-from api.v1.permissions import CreatePermission, DeletePermission, SetUserPermission, ChangePermission, \
-    ShowUserPermissions, ShowPermissions, DeleteUserPermission
+from api.v1.permissions import (
+    CreatePermission,
+    DeletePermission,
+    SetUserPermission,
+    ChangePermission,
+    ShowUserPermissions,
+    ShowPermissions,
+    DeleteUserPermission,
+)
 from db.db_alchemy import db
 from flask import Flask
 from gevent import monkey
+from flasgger import Swagger
 
 monkey.patch_all()
 
@@ -32,6 +40,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 api = Api(app)
+swagger = Swagger(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 

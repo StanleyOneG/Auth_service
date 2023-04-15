@@ -8,6 +8,25 @@ from db.db_alchemy import db
 
 class UserLogIn(Resource):
     def post(self):
+        """
+        Login зарегистрированного пользователя
+        Выдача обновленной пары токенов access token и refresh token
+        ---
+        parameters:
+          - in: formData
+            name: email
+            type: string
+            required: true
+          - in: formData
+            name: password
+            type: string
+            required: true
+        tags:
+          - Вход в аккаунт
+        responses:
+          200:
+            description: Успешный вход в аккаунт
+        """
         parser = reqparse.RequestParser()
         parser.add_argument("email", type=str, required=True, location='form')
         parser.add_argument(
