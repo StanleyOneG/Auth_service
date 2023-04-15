@@ -72,6 +72,20 @@ class RedisSettings(BaseSettings):
         alias_generator = to_upper
 
 
+class SuperUserSettings(BaseSettings):
+    """Configuration for database superuser"""
+
+    login: str
+    email: str
+    password: str
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'SUPERUSER_'
+        alias_generator = to_upper
+
+
 class Settings(BaseSettings):
     """Helper class for configuration access."""
 
@@ -79,3 +93,4 @@ class Settings(BaseSettings):
     redis = RedisSettings()
     pgadmin = PgAdminSettings()
     postgres = PostgresSettings()
+    superuser = SuperUserSettings()

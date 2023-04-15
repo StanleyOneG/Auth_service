@@ -1,41 +1,44 @@
 import os
+from datetime import timedelta
 
-from api.v1.sign_up import UserSignUp
-from api.v1.login import UserLogIn
-from api.v1.refresh import Refresh
-from api.v1.logout import UserLogOut
 from api.v1.change_credentials import ChangeUserCredentials
+from api.v1.login import UserLogIn
+from api.v1.logout import UserLogOut
+from api.v1.permissions import (
+    ChangePermission,
+    CreatePermission,
+    DeletePermission,
+    DeleteUserPermission,
+    SetUserPermission,
+    ShowPermissions,
+    ShowUserPermissions,
+)
+from api.v1.refresh import Refresh
 from api.v1.show_login_history import ShowUserLogInHistory
+from api.v1.sign_up import UserSignUp
 from core.config import (
     DB_URI,
-    REDIS_REFRESH_TOKEN_EXPIRE,
     REDIS_ACCESS_TOKEN_EXPIRE,
+    REDIS_REFRESH_TOKEN_EXPIRE,
 )
 from core.jwt_management import jwt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
-from flask_jwt_extended import jwt_required
-from datetime import timedelta
-
-from api.v1.permissions import (
-    CreatePermission,
-    DeletePermission,
-    SetUserPermission,
-    ChangePermission,
-    ShowUserPermissions,
-    ShowPermissions,
-    DeleteUserPermission,
-)
 from db.db_alchemy import db
-from flask import Flask
-from gevent import monkey
 from flasgger import Swagger
+from flask import Flask
+from flask_jwt_extended import jwt_required
+from gevent import monkey
 
 monkey.patch_all()
 
 import logging
+import uuid
 
+from core.config import SUPERUSER_EMAIL, SUPERUSER_LOGIN, SUPERUSER_PASSWORD
 from flask_restful import Api, Resource
+from models.db_models import User, engine
+from sqlalchemy.orm import sessionmaker
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -75,7 +78,32 @@ app.config["JWT_PUBLIC_KEY"] = public_key
 app.config["JWT_PRIVATE_KEY"] = private_key
 # Disabled for development purposes. Turn on in Production
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-app.config['JWT_REFRESH_COOKIE_PATH'] = '/'
+
+
+@app.before_first_request
+def create_superuser():
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    if (
+        session.query(User).filter_by(email=SUPERUSER_EMAIL).first()
+        is not None
+    ):
+        logger.info("Superuser already exists. Abort creating")
+        return
+    db_user = User(
+        login=SUPERUSER_LOGIN,
+        email=SUPERUSER_EMAIL,
+        password=SUPERUSER_PASSWORD,
+    )
+    db_user.id = uuid.uuid4()
+    session.add(db_user)
+    session.commit()
+    logger.info("Superuser created")
+    return {
+        "id": db_user.id,
+        "login": db_user.login,
+        "email": db_user.email,
+    }
 
 
 class TestHelloWorld(Resource):

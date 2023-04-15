@@ -19,3 +19,7 @@ REDIS_PORT = configs.redis.port
 
 PGADMIN_DEFAULT_EMAIL = configs.pgadmin.default_email
 PGADMIN_DEFAULT_PASSWORD = configs.pgadmin.default_password
+
+SUPERUSER_LOGIN = configs.superuser.login
+SUPERUSER_EMAIL = configs.superuser.email
+SUPERUSER_PASSWORD = configs.superuser.password

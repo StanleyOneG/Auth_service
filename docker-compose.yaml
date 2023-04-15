@@ -12,8 +12,8 @@ services:
       timeout: 20s
       retries: 5
       start_period: 80s
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
 
   sprint06_auth_api:
     build: ./auth_api
@@ -28,6 +28,7 @@ services:
     ports:
       - 8000:8000
     # command: bash -c "alembic upgrade head"
+    container_name: sprint06_auth_api
     
   sprint06_auth_pgadmin:
     image: dpage/pgadmin4:latest

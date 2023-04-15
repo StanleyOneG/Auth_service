@@ -1,23 +1,22 @@
-from werkzeug.security import generate_password_hash, check_password_hash
+from core.config import DB_URI, POSTGRES_SCHEMA_NAME
 from sqlalchemy import (
-    create_engine,
     Column,
+    DateTime,
     ForeignKey,
     Index,
     Integer,
+    MetaData,
     String,
     Text,
     UniqueConstraint,
-    DateTime,
-    MetaData,
+    create_engine,
     schema,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from core.config import DB_URI, POSTGRES_SCHEMA_NAME
-from flask_jwt_extended import get_jwt
+from werkzeug.security import check_password_hash, generate_password_hash
 
 engine = create_engine(DB_URI)
 
@@ -68,7 +67,7 @@ class User(Base):
     def set_password(self, password: str) -> None:
         self.password = generate_password_hash(password)
 
-    def check_password(self, password: str) -> None:
+    def check_password(self, password: str) -> bool:
         return check_password_hash(self.password, password)
 
 
@@ -90,7 +89,6 @@ class Permission(Base):
     __tablename__ = 'permission'
     id = Column(UUID(as_uuid=True), primary_key=True)
     name = Column(Text, nullable=False, unique=True)
-    # user = relationship('User', secondary='user_permission', back_populates='permissions')
 
 
 class UserLoginHistory(Base):
