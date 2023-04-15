@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 
 from api.v1.sign_up import UserSignUp
 from api.v1.login import UserLogIn
@@ -13,9 +12,13 @@ from core.config import (
 from core.jwt_management import jwt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
+from flask_jwt_extended import jwt_required
+from datetime import timedelta
+
+from api.v1.permissions import CreatePermission, DeletePermission, SetUserPermission, ChangePermission, \
+    ShowUserPermissions, ShowPermissions, DeleteUserPermission
 from db.db_alchemy import db
 from flask import Flask
-from flask_jwt_extended import jwt_required
 from gevent import monkey
 
 monkey.patch_all()
@@ -29,7 +32,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 api = Api(app)
-# csrf = CSRFProtect(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 
@@ -44,12 +46,10 @@ private_key = rsa.generate_private_key(
 
 public_key = private_key.public_key()
 
-
 app.config["JWT_TOKEN_LOCATION"] = [
     # "headers",
     "cookies",
 ]
-
 
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -78,6 +78,13 @@ api.add_resource(UserSignUp, '/register')
 api.add_resource(UserLogIn, '/login')
 api.add_resource(Refresh, '/refresh')
 api.add_resource(UserLogOut, '/logout')
+api.add_resource(CreatePermission, '/create_permission')
+api.add_resource(DeletePermission, '/delete_permission')
+api.add_resource(SetUserPermission, '/set_permission')
+api.add_resource(ChangePermission, '/change_permission')
+api.add_resource(ShowUserPermissions, '/show_user_permissions')
+api.add_resource(ShowPermissions, '/show_permissions')
+api.add_resource(DeleteUserPermission, '/delete_user_permission')
 
 if __name__ == "__main__":
     app.run(
