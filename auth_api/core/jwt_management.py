@@ -1,6 +1,5 @@
 import logging
 
-
 from core.base_jwt import BaseJWT
 from db.db_alchemy import db
 from db.db_redis import redis

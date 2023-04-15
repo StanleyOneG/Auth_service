@@ -16,8 +16,8 @@ from db.db_redis import redis
 class BaseJWT:
     @classmethod
     def create_token_pair(cls, user: User, fresh_access_token: bool = False):
-        role = [permission.name for permission in user.permissions]
-        additional_claims = {'role': role}
+        permissions = [permission.permission.name for permission in user.permissions]
+        additional_claims = {'permissions': permissions}
         if fresh_access_token:
             access_token = create_access_token(
                 identity=user.id,

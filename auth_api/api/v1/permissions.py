@@ -1,8 +1,9 @@
-
 from flask import Flask, request, Blueprint, jsonify
 import logging
 from flask_restful import Resource, reqparse
 import uuid
+from flask_jwt_extended import jwt_required, get_jwt
+from core.jwt_management import JWTHandler
 
 from models.db_models import User, Permission, UserPermission
 
@@ -11,22 +12,22 @@ from db.db_alchemy import db
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@sprint06_auth_pg/service_auth'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 
 def check_permission(user_permissions, endpoint_permission):
-    if endpoint_permission in user_permissions:
-        return 200
-    return 403
+    if endpoint_permission in user_permissions['permissions']:
+        return True
+    return False
 
 
 class CreatePermission(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('permission', type=str, required=True, location='form')
 
+    @jwt_required()
     def post(self):
+        if not check_permission(get_jwt(), 'admin'):
+            response = {'message': 'You are not allowed to do this'}
+            return response, 403
         permission = self.parser.parse_args()['permission']
         permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
         if permission_in_db:
@@ -45,7 +46,11 @@ class DeletePermission(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('permission', type=str, required=True, location='form')
 
+    @jwt_required()
     def delete(self):
+        if not check_permission(get_jwt(), 'admin'):
+            response = {'message': 'You are not allowed to do this'}
+            return response, 403
         permission = self.parser.parse_args()['permission']
         permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
         if not permission_in_db:
@@ -56,6 +61,7 @@ class DeletePermission(Resource):
         user_permission_list = db.session.query(UserPermission).filter_by(permission_id=permission_in_db.id).all()
         for user_permission in user_permission_list:
             db.session.delete(user_permission)
+
         db.session.commit()
 
         # Remove the permission from the Permission table
@@ -71,7 +77,11 @@ class SetUserPermission(Resource):
     parser.add_argument('permission', type=str, required=True, location='form')
     parser.add_argument('user_login', type=str, required=True, location='form')
 
+    @jwt_required()
     def post(self):
+        if not check_permission(get_jwt(), 'admin'):
+            response = {'message': 'You are not allowed to do this'}
+            return response, 403
         permission = self.parser.parse_args()['permission']
         user_login = self.parser.parse_args()['user_login']
         permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
@@ -102,7 +112,11 @@ class DeleteUserPermission(Resource):
     parser.add_argument('permission', type=str, required=True, location='form')
     parser.add_argument('user_login', type=str, required=True, location='form')
 
+    @jwt_required()
     def delete(self):
+        if not check_permission(get_jwt(), 'admin'):
+            response = {'message': 'You are not allowed to do this'}
+            return response, 403
         permission = self.parser.parse_args()['permission']
         user_login = self.parser.parse_args()['user_login']
         permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
@@ -129,7 +143,11 @@ class ChangePermission(Resource):
     parser.add_argument('old_permission', type=str, required=True, location='form')
     parser.add_argument('new_permission', type=str, required=True, location='form')
 
+    @jwt_required()
     def patch(self):
+        if not check_permission(get_jwt(), 'admin'):
+            response = {'message': 'You are not allowed to do this'}
+            return response, 403
         permission = self.parser.parse_args()['old_permission']
         new_permission = self.parser.parse_args()['new_permission']
 
@@ -148,9 +166,13 @@ class ChangePermission(Resource):
 
 class ShowUserPermissions(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('user_login', type=str, required=True, location='form')
+    parser.add_argument('user_login', type=str, required=True, location='args')
 
+    @jwt_required()
     def get(self):
+        if not check_permission(get_jwt(), 'admin'):
+            response = {'message': 'You are not allowed to do this'}
+            return response, 403
         user_login = self.parser.parse_args()['user_login']
 
         user = db.session.query(User).filter_by(login=user_login).first()
@@ -173,8 +195,11 @@ class ShowUserPermissions(Resource):
 
 
 class ShowPermissions(Resource):
-
+    @jwt_required()
     def get(self):
+        if not check_permission(get_jwt(), 'admin'):
+            response = {'message': 'You are not allowed to do this'}
+            return response, 403
         permissions = db.session.query(Permission).all()
         permission_names = [permission.name for permission in permissions]
 

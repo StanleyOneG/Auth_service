@@ -9,7 +9,6 @@ from flask_wtf.csrf import generate_csrf
 
 from db.db_alchemy import db
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

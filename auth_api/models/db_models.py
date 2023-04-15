@@ -35,6 +35,7 @@ class UserPermission(Base):
     id = Column(UUID(as_uuid=True), primary_key=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     permission_id = Column(UUID(as_uuid=True), ForeignKey('permission.id', ondelete='CASCADE'), nullable=False)
+    permission = relationship('Permission')
 
     __table_args__ = (UniqueConstraint('user_id', 'permission_id'),)
 class User(Base):
@@ -44,6 +45,7 @@ class User(Base):
     email = Column(Text, nullable=False)
     password = Column(String, nullable=False)
     user_info = relationship('UserInfo', back_populates='user', uselist=False)
+    permissions = relationship('UserPermission')
     login_history = relationship('UserLoginHistory', back_populates='user', order_by='UserLoginHistory.login_at.desc()')
 
     __table_args__ = (UniqueConstraint('login', 'email'),)
@@ -69,6 +71,7 @@ class Permission(Base):
     __tablename__ = 'permission'
     id = Column(UUID(as_uuid=True), primary_key=True)
     name = Column(Text, nullable=False, unique=True)
+    # user = relationship('User', secondary='user_permission', back_populates='permissions')
 
 
 

@@ -1,6 +1,5 @@
 from core.api_conf import Settings
 
-
 configs = Settings()
 
 DB_ENGINE = configs.database.engine
