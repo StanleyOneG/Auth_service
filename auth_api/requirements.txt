@@ -10,3 +10,4 @@ gevent==22.10.2
 flask-wtf==1.1.1
 cryptography==40.0.1
 flask-sqlalchemy==3.0.3
+redis==4.5.4

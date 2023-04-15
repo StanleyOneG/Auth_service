@@ -62,7 +62,8 @@ class RedisSettings(BaseSettings):
 
     host: str
     port: int
-    expire: int
+    refresh_token_expire: int
+    access_token_expire: int
 
     class Config:
         """Configuration class for correct env variables insertion."""

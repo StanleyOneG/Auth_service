@@ -1,15 +1,21 @@
+import os
 from datetime import timedelta
 
 from api.v1.sign_up import UserSignUp
 from api.v1.login import UserLogIn
-from core.config import DB_URI
+from api.v1.refresh import Refresh
+from api.v1.logout import UserLogOut
+from core.config import (
+    DB_URI,
+    REDIS_REFRESH_TOKEN_EXPIRE,
+    REDIS_ACCESS_TOKEN_EXPIRE,
+)
 from core.jwt_management import jwt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from db.db_alchemy import db
 from flask import Flask
-from flask_jwt_extended import JWTManager, jwt_required
-from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import jwt_required
 from gevent import monkey
 
 monkey.patch_all()
@@ -23,7 +29,10 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 api = Api(app)
+# csrf = CSRFProtect(app)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
+
 db.init_app(app)
 jwt.init_app(app)
 
@@ -39,15 +48,23 @@ public_key = private_key.public_key()
 app.config["JWT_TOKEN_LOCATION"] = [
     # "headers",
     "cookies",
-    # "json",
 ]
 
 
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
 app.config["JWT_ALGORITHM"] = "RS256"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
-app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=10)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
+    minutes=float(REDIS_ACCESS_TOKEN_EXPIRE / 60)
+)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
+    hours=float(REDIS_REFRESH_TOKEN_EXPIRE / 60 / 60)
+)
 app.config["JWT_PUBLIC_KEY"] = public_key
 app.config["JWT_PRIVATE_KEY"] = private_key
+# Disabled for development purposes. Turn on in Production
+app.config["JWT_COOKIE_CSRF_PROTECT"] = False
+app.config['JWT_REFRESH_COOKIE_PATH'] = '/refresh'
 
 
 class TestHelloWorld(Resource):
@@ -59,6 +76,8 @@ class TestHelloWorld(Resource):
 api.add_resource(TestHelloWorld, '/hello')
 api.add_resource(UserSignUp, '/register')
 api.add_resource(UserLogIn, '/login')
+api.add_resource(Refresh, '/refresh')
+api.add_resource(UserLogOut, '/logout')
 
 if __name__ == "__main__":
     app.run(
