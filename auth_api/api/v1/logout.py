@@ -1,5 +1,7 @@
 from flask import jsonify
 from flask_jwt_extended import (
+    current_user,
+    get_current_user,
     jwt_required,
     unset_jwt_cookies,
 )
@@ -17,6 +19,12 @@ class UserLogOut(Resource):
         responses:
           200:
             description: Выход из аккаунта выполнен успешно
+        tags:
+          - Выход из аккаунта
+        produces:
+          - application/json
+        security:
+          - JWT: []
         """
         JWTHandler.revoke_refresh_token()
         response = jsonify({'message': 'Successfully logged out'})

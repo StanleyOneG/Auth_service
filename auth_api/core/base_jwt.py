@@ -5,6 +5,7 @@ from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     get_jwt,
+    jwt_required,
 )
 from core.config import REDIS_REFRESH_TOKEN_EXPIRE, REDIS_ACCESS_TOKEN_EXPIRE
 
@@ -35,6 +36,7 @@ class BaseJWT:
         return access_token, refresh_token
 
     @classmethod
+    @jwt_required(optional=True)
     def revoke_token(cls):
         token = get_jwt()
         jti = token["jti"]

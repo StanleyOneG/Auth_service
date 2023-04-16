@@ -28,9 +28,8 @@ class Refresh(Resource):
             description: access token и refresh token успешно обновлены
         """
         user = get_current_user()
-        JWTHandler.revoke_access_token()
         JWTHandler.revoke_refresh_token()
-        unset_jwt_cookies(response=jsonify({'message': 'Cookies revoked'}))
+        # unset_jwt_cookies(response=jsonify({'message': 'Cookies revoked'}))
         access_token, refresh_token = JWTHandler.create_jwt_tokens(user=user)
         response = jsonify({'message': 'Tokens refreshed successfully'})
         set_access_cookies(

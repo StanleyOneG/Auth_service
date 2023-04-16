@@ -30,7 +30,10 @@ class UserLogIn(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument("email", type=str, required=True, location='form')
         parser.add_argument(
-            "password", type=str, required=True, location='form'
+            "password",
+            type=str,
+            required=True,
+            location='form',
         )
         data = parser.parse_args()
         email = data["email"]
@@ -43,9 +46,11 @@ class UserLogIn(Resource):
         access_token, refresh_token = JWTHandler.create_login_tokens(user=user)
         response = jsonify({'message': 'User logged in successfully'})
         set_access_cookies(
-            response=response, encoded_access_token=access_token
+            response=response,
+            encoded_access_token=access_token,
         )
         set_refresh_cookies(
-            response=response, encoded_refresh_token=refresh_token
+            response=response,
+            encoded_refresh_token=refresh_token,
         )
         return response

@@ -4,6 +4,7 @@ from api.v1.sign_up import UserSignUp
 from api.v1.login import UserLogIn
 from api.v1.refresh import Refresh
 from api.v1.logout import UserLogOut
+from api.v1.change_credentials import ChangeUserCredentials
 from core.config import (
     DB_URI,
     REDIS_REFRESH_TOKEN_EXPIRE,
@@ -73,7 +74,7 @@ app.config["JWT_PUBLIC_KEY"] = public_key
 app.config["JWT_PRIVATE_KEY"] = private_key
 # Disabled for development purposes. Turn on in Production
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-app.config['JWT_REFRESH_COOKIE_PATH'] = '/refresh'
+app.config['JWT_REFRESH_COOKIE_PATH'] = '/'
 
 
 class TestHelloWorld(Resource):
@@ -87,6 +88,7 @@ api.add_resource(UserSignUp, '/register')
 api.add_resource(UserLogIn, '/login')
 api.add_resource(Refresh, '/refresh')
 api.add_resource(UserLogOut, '/logout')
+api.add_resource(ChangeUserCredentials, '/change_credentials')
 api.add_resource(CreatePermission, '/create_permission')
 api.add_resource(DeletePermission, '/delete_permission')
 api.add_resource(SetUserPermission, '/set_permission')
