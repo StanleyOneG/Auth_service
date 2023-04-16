@@ -1,0 +1,66 @@
+version: "3.8"
+services:
+  sprint06_auth_tests_pg_server:
+    image: postgres:15.0-alpine
+    volumes:
+      - sprint06_auth_tests_pg_server01data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $POSTGRES_DB -U $POSTGRES_USER"]
+      interval: 3s
+      timeout: 20s
+      retries: 5
+      start_period: 80s
+
+  sprint06_auth_tests_api_server:
+    build:
+      context: ../auth_api
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    depends_on:
+      sprint06_auth_tests_redis_server:
+        condition: service_started
+    ports:
+      - 8000:8000
+    volumes:
+      - ../auth_api:/auth_api:rw
+    tty: true
+    # healthcheck:
+    #   test: curl -XGET http://sprint06_auth_tests_test_server:8000/api/v1/openapi
+    #   interval: 8s
+    #   timeout: 60s
+    #   retries: 5
+    #   start_period: 80s 
+
+  sprint06_auth_tests_redis_server:
+    image: redis:latest
+    volumes:
+      - sprint06_auth_tests_redis_server01data:/data:rw
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+    command: >
+      --save 60 1
+
+  sprint06_auth_tests_tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    depends_on:
+      sprint06_auth_tests_pg_server:
+        condition: service_healthy
+      sprint06_auth_tests_redis_server:
+        condition: service_started
+      # sprint06_auth_tests_api_server:
+      #   condition: service_healthy
+    volumes:
+      - ./src:/tests_data:rw
+
+volumes:
+  sprint06_auth_tests_pg_server01data:
+  sprint06_auth_tests_redis_server01data:
