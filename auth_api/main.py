@@ -33,12 +33,12 @@ from gevent import monkey
 monkey.patch_all()
 
 import logging
-import uuid
-
-from core.config import SUPERUSER_EMAIL, SUPERUSER_LOGIN, SUPERUSER_PASSWORD
-from flask_restful import Api, Resource
-from models.db_models import User, engine
+from flask_wtf import CSRFProtect
+from flask_restful import Resource, Api
 from sqlalchemy.orm import sessionmaker
+from models.db_models import User, UserPermission, Permission, engine
+from core.config import SUPERUSER_EMAIL, SUPERUSER_LOGIN, SUPERUSER_PASSWORD
+import uuid
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -82,13 +82,16 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 
 @app.before_first_request
 def create_superuser():
+    logger.info("============= Superuser creation ===============")
     Session = sessionmaker(bind=engine)
     session = Session()
     if (
         session.query(User).filter_by(email=SUPERUSER_EMAIL).first()
         is not None
     ):
-        logger.info("Superuser already exists. Abort creating")
+        logger.info(
+            "Superuser with provided email already exists. Abort creating"
+        )
         return
     db_user = User(
         login=SUPERUSER_LOGIN,
@@ -101,12 +104,33 @@ def create_superuser():
     db_user.set_password(SUPERUSER_PASSWORD)
     session.add(db_user)
     session.commit()
-    logger.info("Superuser created")
-    return {
-        "id": db_user.id,
-        "login": db_user.login,
-        "email": db_user.email,
-    }
+    logger.info("Superuser added")
+    db_permission = Permission()
+    db_permission.id = uuid.uuid4()
+    db_permission.name = "admin"
+    session.add(db_permission)
+    session.commit()
+    logger.info("Permission 'admin' created")
+
+    db_user_permission = UserPermission()
+    db_user_permission.id = uuid.uuid4()
+    db_user_permission.permission_id = db_permission.id
+    db_user_permission.user_id = db_user.id
+    session.add(db_user_permission)
+    session.commit()
+    logger.info("Permission 'admin' atached to superuser")
+    logger.info("============= Superuser creation ===============")
+
+
+@app.before_request
+def csrf_protect():
+    if (
+        request.method == 'POST'
+        and request.url_root
+        == 'http://sprint06_auth_api:5050',  # TODO: вынести host в env файл
+    ):
+        # exempt the URL from CSRF protection
+        csrf.exempt(request.url)
 
 
 class TestHelloWorld(Resource):
