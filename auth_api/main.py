@@ -5,6 +5,7 @@ from api.v1.login import UserLogIn
 from api.v1.refresh import Refresh
 from api.v1.logout import UserLogOut
 from api.v1.change_credentials import ChangeUserCredentials
+from api.v1.show_login_history import ShowUserLogInHistory
 from core.config import (
     DB_URI,
     REDIS_REFRESH_TOKEN_EXPIRE,
@@ -88,6 +89,7 @@ api.add_resource(UserSignUp, '/api/v1/user/register')
 api.add_resource(UserLogIn, '/api/v1/user/login')
 api.add_resource(Refresh, '/api/v1/user/refresh')
 api.add_resource(UserLogOut, '/api/v1/user/logout')
+api.add_resource(ShowUserLogInHistory, '/api/v1/user/show_login_history')
 api.add_resource(ChangeUserCredentials, '/api/v1/user/change_credentials')
 api.add_resource(CreatePermission, '/api/v1/permission/create_permission')
 api.add_resource(DeletePermission, '/api/v1/permission/delete_permission')
