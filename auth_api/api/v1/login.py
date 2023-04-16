@@ -22,7 +22,7 @@ class UserLogIn(Resource):
             type: string
             required: true
         tags:
-          - Вход в аккаунт
+          - User
         responses:
           200:
             description: Успешный вход в аккаунт

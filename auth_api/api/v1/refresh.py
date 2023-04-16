@@ -20,7 +20,7 @@ class Refresh(Resource):
           200:
             description: A single user item
         tags:
-          - Обновление токенов
+          - User
         security:
           - JWT: []
         responses:

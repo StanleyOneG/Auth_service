@@ -38,7 +38,7 @@ class UserSignUp(Resource):
             type: string
             required: true
         tags:
-          - Регистрация пользователя
+          - User
         produces:
           - application/json
         security:

@@ -84,18 +84,18 @@ class TestHelloWorld(Resource):
 
 
 api.add_resource(TestHelloWorld, '/hello')
-api.add_resource(UserSignUp, '/register')
-api.add_resource(UserLogIn, '/login')
-api.add_resource(Refresh, '/refresh')
-api.add_resource(UserLogOut, '/logout')
-api.add_resource(ChangeUserCredentials, '/change_credentials')
-api.add_resource(CreatePermission, '/create_permission')
-api.add_resource(DeletePermission, '/delete_permission')
-api.add_resource(SetUserPermission, '/set_permission')
-api.add_resource(ChangePermission, '/change_permission')
-api.add_resource(ShowUserPermissions, '/show_user_permissions')
-api.add_resource(ShowPermissions, '/show_permissions')
-api.add_resource(DeleteUserPermission, '/delete_user_permission')
+api.add_resource(UserSignUp, '/api/v1/user/register')
+api.add_resource(UserLogIn, '/api/v1/user/login')
+api.add_resource(Refresh, '/api/v1/user/refresh')
+api.add_resource(UserLogOut, '/api/v1/user/logout')
+api.add_resource(ChangeUserCredentials, '/api/v1/user/change_credentials')
+api.add_resource(CreatePermission, '/api/v1/permission/create_permission')
+api.add_resource(DeletePermission, '/api/v1/permission/delete_permission')
+api.add_resource(SetUserPermission, '/api/v1/user/set_permission')
+api.add_resource(ChangePermission, '/api/v1/permission/change_permission')
+api.add_resource(ShowUserPermissions, '/api/v1/user/show_user_permissions')
+api.add_resource(ShowPermissions, '/api/v1/permission/show_permissions')
+api.add_resource(DeleteUserPermission, '/api/v1/user/delete_user_permission')
 
 if __name__ == "__main__":
     app.run(

@@ -11,7 +11,7 @@ from core.jwt_management import JWTHandler
 
 class UserLogOut(Resource):
     @jwt_required(verify_type=False)
-    def delete(self):
+    def patch(self):
         """
         Выход пользователя из аккаунта
         Отзыв access token и refresh token
@@ -20,7 +20,7 @@ class UserLogOut(Resource):
           200:
             description: Выход из аккаунта выполнен успешно
         tags:
-          - Выход из аккаунта
+          - User
         produces:
           - application/json
         security:

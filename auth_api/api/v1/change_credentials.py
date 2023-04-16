@@ -33,7 +33,7 @@ class ChangeUserCredentials(Resource):
             type: string
             required: false
         tags:
-          - Изменение логина и пароля
+          - User
         produces:
           - application/json
         security:
