@@ -86,6 +86,20 @@ class SuperUserSettings(BaseSettings):
         alias_generator = to_upper
 
 
+class ServerSettings(BaseSettings):
+    """Configuration for server."""
+
+    host: str
+    port: int
+    debug: bool
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'SERVER_'
+        alias_generator = to_upper
+
+
 class Settings(BaseSettings):
     """Helper class for configuration access."""
 
@@ -94,3 +108,4 @@ class Settings(BaseSettings):
     pgadmin = PgAdminSettings()
     postgres = PostgresSettings()
     superuser = SuperUserSettings()
+    server = ServerSettings()

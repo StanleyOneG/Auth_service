@@ -23,3 +23,7 @@ PGADMIN_DEFAULT_PASSWORD = configs.pgadmin.default_password
 SUPERUSER_LOGIN = configs.superuser.login
 SUPERUSER_EMAIL = configs.superuser.email
 SUPERUSER_PASSWORD = configs.superuser.password
+
+SERVER_HOST = configs.server.host
+SERVER_PORT = configs.server.port
+SERVER_DEBUG = configs.server.debug

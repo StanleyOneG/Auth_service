@@ -24,15 +24,15 @@ services:
         condition: service_started
     ports:
       - 8000:8000
-    volumes:
-      - ../auth_api:/auth_api:rw
-    tty: true
-    # healthcheck:
-    #   test: curl -XGET http://sprint06_auth_tests_test_server:8000/api/v1/openapi
-    #   interval: 8s
-    #   timeout: 60s
-    #   retries: 5
-    #   start_period: 80s 
+    # volumes:
+    #   - ../auth_api:/auth_api:rw
+    # tty: true
+    healthcheck:
+      test: curl -XGET http://sprint06_auth_tests_test_server:8000/api/v1/openapi
+      interval: 8s
+      timeout: 60s
+      retries: 5
+      start_period: 80s 
 
   sprint06_auth_tests_redis_server:
     image: redis:latest
@@ -56,10 +56,10 @@ services:
         condition: service_healthy
       sprint06_auth_tests_redis_server:
         condition: service_started
-      # sprint06_auth_tests_api_server:
-      #   condition: service_healthy
-    volumes:
-      - ./src:/tests_data:rw
+      sprint06_auth_tests_api_server:
+        condition: service_healthy
+    # volumes:
+    #   - ./src:/tests_data:rw
 
 volumes:
   sprint06_auth_tests_pg_server01data:

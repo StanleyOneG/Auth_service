@@ -35,7 +35,14 @@ monkey.patch_all()
 import logging
 import uuid
 
-from core.config import SUPERUSER_EMAIL, SUPERUSER_LOGIN, SUPERUSER_PASSWORD
+from core.config import (
+    SUPERUSER_EMAIL,
+    SUPERUSER_LOGIN,
+    SUPERUSER_PASSWORD,
+    SERVER_HOST,
+    SERVER_PORT,
+    SERVER_DEBUG,
+)
 from flask_restful import Api, Resource
 from models.db_models import Permission, User, UserPermission, engine
 from sqlalchemy.orm import sessionmaker
@@ -78,6 +85,7 @@ app.config["JWT_PUBLIC_KEY"] = public_key
 app.config["JWT_PRIVATE_KEY"] = private_key
 # Disabled for development purposes. Turn on in Production
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 
 @app.before_first_request
@@ -144,6 +152,4 @@ api.add_resource(ShowPermissions, '/api/v1/permission/show_permissions')
 api.add_resource(DeleteUserPermission, '/api/v1/user/delete_user_permission')
 
 if __name__ == "__main__":
-    app.run(
-        debug=True, host='sprint06_auth_api', port='8000'
-    )  # TODO: вынести host в env файл
+    app.run(debug=SERVER_DEBUG, host=SERVER_HOST, port=SERVER_PORT)

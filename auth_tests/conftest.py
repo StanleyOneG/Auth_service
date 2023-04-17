@@ -7,7 +7,7 @@ from redis import Redis
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
-from settings import test_settings
+from auth_tests.settings import test_settings
 from auth_api.models.db_models import User
 
 logger = logging.getLogger('tests')
@@ -17,6 +17,7 @@ logger = logging.getLogger('tests')
 async def get_client_session():
     async with aiohttp.ClientSession() as session:
         yield session
+
 
 @pytest.fixture(scope='module')
 async def registered_user_access_token(get_client_session):

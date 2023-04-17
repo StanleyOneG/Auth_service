@@ -1,9 +1,10 @@
 from datetime import datetime
 
 from flask import jsonify
-from flask_jwt_extended import current_user, jwt_required
+from flask_jwt_extended import current_user, get_current_user, jwt_required
 from flask_restful import Resource
 from models.db_models import User, UserLoginHistory
+from flask_jwt_extended.exceptions import FreshTokenRequired
 
 
 class ShowUserLogInHistory(Resource):
@@ -35,4 +36,4 @@ class ShowUserLogInHistory(Resource):
         last_five_logins = []
         for time, agent in zip(login_time[:5], login_user_agent[:5]):
             last_five_logins.append({'login_time': time, 'login_agent': agent})
-        return jsonify({'Last five logins': f'{last_five_logins}'})
+        return {'Last five logins': f'{last_five_logins}'}, 200
