@@ -6,3 +6,4 @@ aiohttp==3.8.4
 pydantic==1.10.5
 flask-sqlalchemy==3.0.3
 aiohttp==3.8.4
+psycopg2-binary==2.9.6

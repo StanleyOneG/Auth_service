@@ -1,4 +1,5 @@
 from pydantic import BaseSettings, Field
+from psycopg2 import connect
 
 
 class TestSettings(BaseSettings):
@@ -25,3 +26,15 @@ class TestSettings(BaseSettings):
 
 
 test_settings = TestSettings()
+
+
+# psycopg2 connection to postgres database
+conn = connect(
+    host=test_settings.pg_host,
+    port=test_settings.pg_port,
+    user=test_settings.pg_user,
+    password=test_settings.pg_password,
+    database=test_settings.pg_db,
+    options="-c search_path=auth",
+)
+conn.autocommit = True

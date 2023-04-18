@@ -22,13 +22,16 @@ services:
     depends_on:
       sprint06_auth_tests_redis_server:
         condition: service_started
+      sprint06_auth_tests_pg_server:
+        condition: service_healthy
     ports:
       - 8000:8000
+    tty: false
     # volumes:
     #   - ../auth_api:/auth_api:rw
     # tty: true
     healthcheck:
-      test: curl -XGET http://sprint06_auth_tests_test_server:8000/api/v1/openapi
+      test: curl -XGET http://sprint06_auth_tests_api_server:8000/apidocs
       interval: 8s
       timeout: 60s
       retries: 5
@@ -37,7 +40,7 @@ services:
   sprint06_auth_tests_redis_server:
     image: redis:latest
     volumes:
-      - sprint06_auth_tests_redis_server01data:/data:rw
+      - sprint06_auth_tests_redis_server01data:/data
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
@@ -59,7 +62,8 @@ services:
       sprint06_auth_tests_api_server:
         condition: service_healthy
     # volumes:
-    #   - ./src:/tests_data:rw
+    #   - ./:/auth_tests:rw
+    # tty: true
 
 volumes:
   sprint06_auth_tests_pg_server01data:

@@ -8,17 +8,19 @@ ENV \
 RUN mkdir -p /auth_tests
 
 COPY ./ /auth_tests
+# COPY ./requirements.txt .
 
 RUN \
     groupadd -r tester && useradd -d /auth_tests -r -g tester tester \
     && chown tester:tester -R /auth_tests \
     && pip install --upgrade wheel \
-    && python3 -m pip install -r /auth_tests/requirements.txt
+    # && python3 -m pip install -r ./requirements.txt
+    && python3 -m pip install -r ./auth_tests/requirements.txt 
 
 
-
-WORKDIR /auth_tests
+WORKDIR /auth_tests/functional
 
 USER tester
 
-ENTRYPOINT pytest src/
+ENTRYPOINT pytest src/test_user_account.py
+# ENTRYPOINT [ "python" ]
