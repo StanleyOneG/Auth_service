@@ -17,20 +17,23 @@ def log_user_login_action(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         response: Response = func(*args, **kwargs)
-        if response.status_code == 200:
-            email = request.form.get('email')
-            user = db.session.query(User).filter_by(email=email).first()
-            if user:
-                user_agent = request.headers.get('User-Agent')
-                login_time = datetime.utcnow()
-                user_login_log = UserLoginHistory(
-                    id=uuid.uuid4(),
-                    user_id=user.id,
-                    login_at=login_time,
-                    user_agent=user_agent,
-                )
-                db.session.add(user_login_log)
-                db.session.commit()
-                return response
+        try:
+            if response.status_code == 200:
+                email = request.form.get('email')
+                user = db.session.query(User).filter_by(email=email).first()
+                if user:
+                    user_agent = request.headers.get('User-Agent')
+                    login_time = datetime.utcnow()
+                    user_login_log = UserLoginHistory(
+                        id=uuid.uuid4(),
+                        user_id=user.id,
+                        login_at=login_time,
+                        user_agent=user_agent,
+                    )
+                    db.session.add(user_login_log)
+                    db.session.commit()
+                    return response
+        except AttributeError:
+            return response
 
     return wrapper
