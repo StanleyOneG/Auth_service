@@ -50,6 +50,16 @@ def delete_request():
 
 
 @pytest.fixture
+def put_request():
+    def _put_request(endpoint, form_data, cookies):
+        url = test_settings.service_url + endpoint
+        response = requests.put(url, data=form_data, cookies=cookies)
+        return response
+
+    return _put_request
+
+
+@pytest.fixture
 def do_test_user_login(post_request):
     def _do_test_user_login():
         data = {

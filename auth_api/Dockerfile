@@ -10,6 +10,7 @@ COPY ./ /auth_api
 # COPY ./requirements.txt /auth_api 
 RUN \
     pip install --upgrade wheel \
+    && python3 -m pip install --upgrade pip \
     && python3 -m pip install -r /auth_api/requirements.txt
 
 WORKDIR /auth_api
