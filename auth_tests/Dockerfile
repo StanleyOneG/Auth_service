@@ -14,7 +14,7 @@ RUN \
     groupadd -r tester && useradd -d /auth_tests -r -g tester tester \
     && chown tester:tester -R /auth_tests \
     && pip install --upgrade wheel \
-    && python3 -m pip install -r ./requirements.txt \
+    && python3 -m pip install --upgrade pip \
     && python3 -m pip install -r ./auth_tests/requirements.txt 
 
 
