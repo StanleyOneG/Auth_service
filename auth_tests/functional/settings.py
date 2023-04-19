@@ -1,8 +1,12 @@
 from pydantic import BaseSettings, Field
 from psycopg2 import connect
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class TestSettings(BaseSettings):
+
     db_engine: str = Field(..., env='DB_ENGINE')
     pg_host: str = Field(..., env='POSTGRES_HOST')
     pg_port: str = Field(..., env='POSTGRES_PORT')

@@ -22,5 +22,5 @@ WORKDIR /auth_tests/functional
 
 USER tester
 
-ENTRYPOINT pytest src/test_user_account.py
+ENTRYPOINT pytest src/test_permissions.py
 # ENTRYPOINT [ "python" ]

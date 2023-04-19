@@ -12,6 +12,8 @@ services:
       timeout: 20s
       retries: 5
       start_period: 80s
+    ports:
+      - 5432:5432
 
   sprint06_auth_tests_api_server:
     build:
@@ -49,21 +51,21 @@ services:
       --save 60 1
 
   sprint06_auth_tests_tests:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - ./.env
-    depends_on:
-      sprint06_auth_tests_pg_server:
-        condition: service_healthy
-      sprint06_auth_tests_redis_server:
-        condition: service_started
-      sprint06_auth_tests_api_server:
-        condition: service_healthy
-    # volumes:
-    #   - ./:/auth_tests:rw
-    # tty: true
+      build:
+        context: .
+        dockerfile: Dockerfile
+      env_file:
+        - ./.env
+      depends_on:
+        sprint06_auth_tests_pg_server:
+          condition: service_healthy
+        sprint06_auth_tests_redis_server:
+          condition: service_started
+        sprint06_auth_tests_api_server:
+          condition: service_healthy
+#     volumes:
+#       - ./:/auth_tests:rw
+#     tty: true
 
 volumes:
   sprint06_auth_tests_pg_server01data:
