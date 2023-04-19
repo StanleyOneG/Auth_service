@@ -135,3 +135,4 @@ dmypy.json
 *pyproject.toml
 *poetry.lock
 .DS_Store
+.env
