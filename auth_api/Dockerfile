@@ -16,6 +16,4 @@ RUN \
 WORKDIR /auth_api
 
 EXPOSE 8000
-
-# ENTRYPOINT [ "python" ]
 CMD alembic upgrade head && python main.py

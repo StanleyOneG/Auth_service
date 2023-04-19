@@ -68,7 +68,6 @@ private_key = rsa.generate_private_key(
 public_key = private_key.public_key()
 
 app.config["JWT_TOKEN_LOCATION"] = [
-    # "headers",
     "cookies",
 ]
 
