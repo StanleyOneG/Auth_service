@@ -126,6 +126,7 @@ def create_superuser():
     session.add(db_user_permission)
     session.commit()
     logger.info("Permission 'admin' atached to superuser")
+    session.close()
     logger.info("============= Superuser creation ===============")
 
 
