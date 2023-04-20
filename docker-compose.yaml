@@ -12,16 +12,11 @@ services:
       timeout: 20s
       retries: 5
       start_period: 80s
-    # ports:
-    #   - "5432:5432"
 
   sprint06_auth_api:
     build: ./auth_api
     env_file:
       - ./.env
-    volumes:
-      - ./auth_api:/auth_api:rw
-    tty: true
     depends_on:
       sprint06_auth_pg:
         condition: service_healthy
@@ -29,20 +24,11 @@ services:
       - 8000:8000
     # command: bash -c "alembic upgrade head"
     container_name: sprint06_auth_api
-    
-  sprint06_auth_pgadmin:
-    image: dpage/pgadmin4:latest
-    env_file:
-      - ./.env
-    ports:
-      - '5050:80'
-    depends_on:
-      - sprint06_auth_pg
 
   sprint06_auth_redis:
     image: redis:latest
     volumes:
-      - sprint06_auth_redis01data:/data:rw
+      - sprint06_auth_redis01data:/data
 
     command: >
       --save 60 1
