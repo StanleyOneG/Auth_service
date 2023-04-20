@@ -16,4 +16,4 @@ RUN \
 WORKDIR /auth_api
 
 EXPOSE 8000
-CMD alembic upgrade head && python main.py
+CMD alembic upgrade head && gunicorn main:app -w 2 -b 0.0.0.0:8000
