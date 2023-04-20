@@ -33,19 +33,14 @@ from gevent import monkey
 monkey.patch_all()
 
 import logging
-import uuid
 
 from core.config import (
-    SUPERUSER_EMAIL,
-    SUPERUSER_LOGIN,
-    SUPERUSER_PASSWORD,
     SERVER_HOST,
     SERVER_PORT,
     SERVER_DEBUG,
 )
+from commands import superuser_bp
 from flask_restful import Api, Resource
-from models.db_models import Permission, User, UserPermission, engine
-from sqlalchemy.orm import sessionmaker
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -85,48 +80,7 @@ app.config["JWT_PRIVATE_KEY"] = private_key
 # Disabled for development purposes. Turn on in Production
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
-
-
-@app.before_first_request
-def create_superuser():
-    logger.info("============= Superuser creation ===============")
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    if (
-        session.query(User).filter_by(email=SUPERUSER_EMAIL).first()
-        is not None
-    ):
-        logger.info(
-            "Superuser with provided email already exists. Abort creating"
-        )
-        return
-    db_user = User(
-        login=SUPERUSER_LOGIN,
-        email=SUPERUSER_EMAIL,
-        password=SUPERUSER_PASSWORD,
-    )
-    db_user.id = uuid.uuid4()
-    db_user.login = SUPERUSER_LOGIN
-    db_user.email = SUPERUSER_EMAIL
-    db_user.set_password(SUPERUSER_PASSWORD)
-    session.add(db_user)
-    session.commit()
-    logger.info("Superuser added")
-    db_permission = Permission()
-    db_permission.id = uuid.uuid4()
-    db_permission.name = "admin"
-    session.add(db_permission)
-    session.commit()
-    logger.info("Permission 'admin' created")
-
-    db_user_permission = UserPermission()
-    db_user_permission.id = uuid.uuid4()
-    db_user_permission.permission_id = db_permission.id
-    db_user_permission.user_id = db_user.id
-    session.add(db_user_permission)
-    session.commit()
-    logger.info("Permission 'admin' atached to superuser")
-    logger.info("============= Superuser creation ===============")
+app.register_blueprint(superuser_bp)
 
 
 class TestHelloWorld(Resource):
