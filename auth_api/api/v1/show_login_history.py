@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from flask import jsonify
 from flask_jwt_extended import current_user, get_current_user, jwt_required
 from flask_restful import Resource
 from models.db_models import User, UserLoginHistory
-from flask_jwt_extended.exceptions import FreshTokenRequired
+from flask import jsonify, request
+from db.db_alchemy import db
 
 
 class ShowUserLogInHistory(Resource):
@@ -14,9 +14,17 @@ class ShowUserLogInHistory(Resource):
         Получение пользователем истории входов в аккаунт (5 последних входов)
         Для получения истории входов требуется "свежий" jwt access token (необходимо выполнить login)
         ---
+        parameters:
+          - name: page
+            in: query
+            description: Номер страницы
+            required: false
+            type: integer
+            format: int64
+            default: 1
         responses:
           200:
-            description: Выход из аккаунта выполнен успешно
+            description: Список объектов с датой и временем входа и информацией об user-агенте пользователя.
         tags:
           - User
         produces:
@@ -24,16 +32,17 @@ class ShowUserLogInHistory(Resource):
         security:
           - JWT: []
         """
-        user: User = current_user
-        user_history: list(UserLoginHistory) = user.login_history
-        login_time = []
-        login_user_agent = []
-        for item in user_history:
-            login_time.append(
-                datetime.strftime(item.login_at, '%Y-%m-%d %H:%M:%S')
-            )
-            login_user_agent.append(item.user_agent)
-        last_five_logins = []
-        for time, agent in zip(login_time[:5], login_user_agent[:5]):
-            last_five_logins.append({'login_time': time, 'login_agent': agent})
-        return {'Last five logins': f'{last_five_logins}'}, 200
+        user_history_query = db.session.query(UserLoginHistory).filter_by(user_id=current_user.id).order_by(
+            UserLoginHistory.login_at.desc())
+
+        page = db.paginate(user_history_query, page=request.args.get('page', 1, type=int), per_page=5)
+
+        # Extract the relevant data for each login history item
+        logins = []
+        for item in page.items:
+            login_time = datetime.strftime(item.login_at, '%Y-%m-%d %H:%M:%S')
+            login_agent = item.user_agent
+            logins.append({'login_time': login_time, 'user_agent': login_agent})
+
+        # Return the last five logins as a JSON response
+        return jsonify(logins)
