@@ -14,7 +14,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -82,7 +82,9 @@ class UserInfo(Base):
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
     age = Column(Integer)
-    user = relationship('User', back_populates='user_info')
+    user = relationship('User',
+                        back_populates='user_info',
+                        uselist=False)
 
 
 class Permission(Base):
