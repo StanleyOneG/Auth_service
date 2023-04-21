@@ -22,7 +22,6 @@ services:
         condition: service_healthy
     ports:
       - 8000:8000
-    # command: bash -c "alembic upgrade head"
     container_name: sprint06_auth_api
 
   sprint06_auth_redis:

@@ -25,11 +25,7 @@ monkey.patch_all()
 
 import logging
 
-from core.config import (
-    SERVER_HOST,
-    SERVER_PORT,
-    SERVER_DEBUG
-)
+from core.config import SERVER_HOST, SERVER_PORT, SERVER_DEBUG
 from commands import superuser_bp
 from flask_restful import Api, Resource
 from core.app_config import TestingConfig, ProductionConfig
