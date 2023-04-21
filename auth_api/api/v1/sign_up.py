@@ -8,6 +8,7 @@ from flask import jsonify
 from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 from flask_restful import Resource, reqparse
 from models.db_models import User
+from http import HTTPStatus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ class UserSignUp(Resource):
         user = db.session.query(User).filter_by(email=email).first()
         if user:
             response = {'message': 'User with this email already exists'}
-            return response, 401
+            return response, HTTPStatus.UNAUTHORIZED
         new_user = User()
         new_user.id = uuid.uuid4()
         new_user.email = email

@@ -5,6 +5,7 @@ from flask import jsonify
 from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 from flask_restful import Resource, reqparse
 from models.db_models import User
+from http import HTTPStatus
 
 
 class UserLogIn(Resource):
@@ -48,9 +49,9 @@ class UserLogIn(Resource):
         password = data["password"]
         user = db.session.query(User).filter_by(email=email).first()
         if user is None:
-            return {"msg": "Bad email or password"}, 401
+            return {"msg": "Bad email or password"}, HTTPStatus.UNAUTHORIZED
         if not user.check_password(password):
-            return {"msg": "Bad email or password"}, 401
+            return {"msg": "Bad email or password"}, HTTPStatus.UNAUTHORIZED
         access_token, refresh_token = JWTHandler.create_login_tokens(user=user)
         response = jsonify({'message': f'User logged in successfully'})
         set_access_cookies(
