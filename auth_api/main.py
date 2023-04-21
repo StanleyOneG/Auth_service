@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import timedelta
 
@@ -16,6 +17,7 @@ from api.v1.permissions import (
 from api.v1.refresh import Refresh
 from api.v1.show_login_history import ShowUserLogInHistory
 from api.v1.sign_up import UserSignUp
+from core.exception_handler import handle_exception
 from core.config import (
     DB_URI,
     REDIS_ACCESS_TOKEN_EXPIRE,
@@ -46,6 +48,7 @@ from core.config import (
 from flask_restful import Api, Resource
 from models.db_models import Permission, User, UserPermission, engine
 from sqlalchemy.orm import sessionmaker
+from werkzeug.exceptions import HTTPException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -53,6 +56,8 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
+
+app.register_error_handler(HTTPException, handle_exception)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
 
