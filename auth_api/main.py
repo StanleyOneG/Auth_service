@@ -13,6 +13,8 @@ from api.v1.permissions import (
 from api.v1.refresh import Refresh
 from api.v1.show_login_history import ShowUserLogInHistory
 from api.v1.sign_up import UserSignUp
+
+from commands import create_superuser, superuser_bp
 from core.exception_handler import handle_exception
 from core.jwt_management import jwt
 from db.db_alchemy import db
@@ -27,7 +29,8 @@ monkey.patch_all()
 import logging
 
 from core.config import SERVER_HOST, SERVER_PORT, SERVER_DEBUG
-from commands import superuser_bp
+
+# from commands import superuser_bp
 from flask_restful import Api, Resource
 from core.app_config import TestingConfig, ProductionConfig
 from werkzeug.exceptions import HTTPException
@@ -48,6 +51,7 @@ db.init_app(app)
 jwt.init_app(app)
 
 app.register_blueprint(superuser_bp)
+app.cli.add_command(create_superuser, name="create_superuser")
 
 
 class TestHelloWorld(Resource):

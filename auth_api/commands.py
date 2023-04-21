@@ -1,40 +1,29 @@
 """Help module for cli commands"""
 import uuid
 import click
-from core.config import (
-    SUPERUSER_EMAIL,
-    SUPERUSER_LOGIN,
-    SUPERUSER_PASSWORD
-)
+from core.config import SUPERUSER_EMAIL, SUPERUSER_LOGIN, SUPERUSER_PASSWORD
 import logging
 from sqlalchemy.orm import sessionmaker
-from models.db_models import (
-    engine,
-    User,
-    Permission,
-    UserPermission
-)
+from models.db_models import engine, User, Permission, UserPermission
 from flask import Blueprint
 
 logger = logging.getLogger(__name__)
-superuser_bp = Blueprint('superuser', __name__)
+superuser_bp = Blueprint('create_superuser', __name__)
 
 
-@superuser_bp.cli.command("create_superuser")
-@click.option('--login')
-@click.option('--email')
-@click.option('--password')
-def create_superuser(login:str=SUPERUSER_LOGIN,
-                     email:str=SUPERUSER_EMAIL,
-                     password:str=SUPERUSER_PASSWORD):
-
+@superuser_bp.cli.command()
+@click.option('--login', default=SUPERUSER_LOGIN)
+@click.option('--email', default=SUPERUSER_EMAIL)
+@click.option('--password', default=SUPERUSER_PASSWORD)
+def create_superuser(
+    login: str = SUPERUSER_LOGIN,
+    email: str = SUPERUSER_EMAIL,
+    password: str = SUPERUSER_PASSWORD,
+):
     logger.info("============= Superuser creation ===============")
     Session = sessionmaker(bind=engine)
     session = Session()
-    if (
-        session.query(User).filter_by(email=email).first()
-        is not None
-    ):
+    if session.query(User).filter_by(email=email).first() is not None:
         logger.info(
             "Superuser with provided email already exists. Abort creating"
         )
