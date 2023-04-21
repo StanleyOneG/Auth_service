@@ -1,6 +1,3 @@
-import os
-from datetime import timedelta
-
 from api.v1.change_credentials import ChangeUserCredentials
 from api.v1.login import UserLogIn
 from api.v1.logout import UserLogOut
@@ -16,17 +13,11 @@ from api.v1.permissions import (
 from api.v1.refresh import Refresh
 from api.v1.show_login_history import ShowUserLogInHistory
 from api.v1.sign_up import UserSignUp
-from core.config import (
-    DB_URI,
-    REDIS_ACCESS_TOKEN_EXPIRE,
-    REDIS_REFRESH_TOKEN_EXPIRE,
-)
 from core.jwt_management import jwt
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
 from db.db_alchemy import db
 from flasgger import Swagger
 from flask import Flask
+from flask_migrate import Migrate
 from flask_jwt_extended import jwt_required
 from gevent import monkey
 
@@ -37,49 +28,24 @@ import logging
 from core.config import (
     SERVER_HOST,
     SERVER_PORT,
-    SERVER_DEBUG,
+    SERVER_DEBUG
 )
 from commands import superuser_bp
 from flask_restful import Api, Resource
+from core.app_config import TestingConfig, ProductionConfig
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+app.config.from_object(TestingConfig())
 api = Api(app)
 swagger = Swagger(app)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = DB_URI
+migrate = Migrate(app, db)
 
 db.init_app(app)
 jwt.init_app(app)
 
-private_key = rsa.generate_private_key(
-    public_exponent=65537,
-    key_size=2048,
-    backend=default_backend(),
-)
-
-public_key = private_key.public_key()
-
-app.config["JWT_TOKEN_LOCATION"] = [
-    "cookies",
-]
-
-SECRET_KEY = os.urandom(32)
-app.config['SECRET_KEY'] = SECRET_KEY
-app.config["JWT_ALGORITHM"] = "RS256"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(
-    minutes=float(REDIS_ACCESS_TOKEN_EXPIRE / 60)
-)
-app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(
-    hours=float(REDIS_REFRESH_TOKEN_EXPIRE / 60 / 60)
-)
-app.config["JWT_PUBLIC_KEY"] = public_key
-app.config["JWT_PRIVATE_KEY"] = private_key
-# Disabled for development purposes. Turn on in Production
-app.config["JWT_COOKIE_CSRF_PROTECT"] = False
-app.config['PROPAGATE_EXCEPTIONS'] = True
 app.register_blueprint(superuser_bp)
 
 

@@ -7,7 +7,6 @@ ENV \
 
 RUN mkdir -p /auth_api
 COPY ./ /auth_api
-# COPY ./requirements.txt /auth_api 
 RUN \
     pip install --upgrade wheel \
     && python3 -m pip install --upgrade pip \
@@ -16,4 +15,8 @@ RUN \
 WORKDIR /auth_api
 
 EXPOSE 8000
-CMD alembic upgrade head && python main.py
+ENV FLASK_APP /auth_api/main.py
+CMD flask db init \
+    && flask db migrate -m "Initial migration" && flask db upgrade \
+    && python main.py
+# CMD alembic upgrade head && python main.py

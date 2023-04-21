@@ -110,4 +110,4 @@ class UserLoginHistory(Base):
 
 Index('user_login_history_login_at_idx', UserLoginHistory.login_at)
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)
