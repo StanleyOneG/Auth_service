@@ -8,7 +8,6 @@ ENV \
 RUN mkdir -p /auth_tests
 
 COPY ./ /auth_tests
-# COPY ./requirements.txt .
 
 RUN \
     groupadd -r tester && useradd -d /auth_tests -r -g tester tester \

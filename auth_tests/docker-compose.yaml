@@ -27,9 +27,6 @@ services:
     ports:
       - "8000:8000"
     tty: false
-    # volumes:
-    #   - ../auth_api:/auth_api:rw
-    # tty: true
     healthcheck:
       test: curl -XGET http://sprint06_auth_tests_api_server:8000/apidocs
       interval: 8s
@@ -62,7 +59,7 @@ services:
       sprint06_auth_tests_api_server:
         condition: service_healthy
     # volumes:
-    #   - ./:/auth_tests:rw
+    #   - ./:/auth_tests:ro
     # tty: true
 
 volumes:

@@ -4,7 +4,6 @@ from http import HTTPStatus
 import pytest
 from functional.settings import conn
 from requests import Response
-import ast
 from functional.conftest import (
     TEST_USER_EMAIL,
     TEST_USER_LOGIN,
@@ -73,9 +72,9 @@ def test_user_log_history(post_request, get_request):
         '/api/v1/user/show_login_history',
         cookies=login_response.cookies,
     )
-    result = dict(hist_response.json())['Last five logins']
+    result = hist_response.json()
     assert hist_response.status_code == HTTPStatus.OK
-    assert ast.literal_eval(result)[0]['login_time'] == login_time.strftime(
+    assert result[0]['login_time'] == login_time.strftime(
         '%Y-%m-%d %H:%M:%S',
     )
 

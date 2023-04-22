@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from api.v1.change_credentials import ChangeUserCredentials
 from api.v1.login import UserLogIn
 from api.v1.logout import UserLogOut
@@ -55,13 +56,13 @@ app.cli.add_command(create_superuser, name="create_superuser")
 
 
 class TestHelloWorld(Resource):
-    @app.errorhandler(HTTPException)
     @jwt_required()
     def get(self):
-        return {'message': 'Hello, World!'}
+        # return {'message': 'Hello, World!'}
+        raise HTTPStatus.BAD_REQUEST
 
 
-api.add_resource(TestHelloWorld, '/hello')
+api.add_resource(TestHelloWorld, '/api/hello')
 api.add_resource(UserSignUp, '/api/v1/user/register')
 api.add_resource(UserLogIn, '/api/v1/user/login')
 api.add_resource(Refresh, '/api/v1/user/refresh')
