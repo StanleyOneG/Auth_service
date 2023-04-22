@@ -55,6 +55,7 @@ app.cli.add_command(create_superuser, name="create_superuser")
 
 
 class TestHelloWorld(Resource):
+    @app.errorhandler(HTTPException)
     @jwt_required()
     def get(self):
         return {'message': 'Hello, World!'}

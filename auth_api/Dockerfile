@@ -19,7 +19,6 @@ EXPOSE 8000
 ENV FLASK_APP="main"
 
 CMD \
-    python -m flask db migrate -m "Initial migration" \
-    && python -m flask db upgrade \
+    python -m flask db upgrade \
     && python -m flask create_superuser \
     && gunicorn main:app -w 2 -b 0.0.0.0:8000 

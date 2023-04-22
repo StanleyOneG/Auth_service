@@ -22,8 +22,6 @@ services:
         condition: service_healthy
     expose:
       - 8000
-    # ports:
-    #   - 8000:8000
     container_name: sprint06_auth_api
 
   sprint06_auth_redis:
