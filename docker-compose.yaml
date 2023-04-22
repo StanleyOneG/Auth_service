@@ -20,6 +20,8 @@ services:
     depends_on:
       sprint06_auth_pg:
         condition: service_healthy
+    volumes:
+      - sprint06_auth_api_static:/usr/local/lib/python3.10/site-packages/flasgger/ui3/static/
     expose:
       - 8000
     container_name: sprint06_auth_api
@@ -38,6 +40,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - sprint06_auth_api_static:/static:ro
     depends_on:
       - sprint06_auth_api
     ports:
@@ -47,3 +50,4 @@ services:
 volumes:
   sprint06_auth_pg01data:
   sprint06_auth_redis01data:
+  sprint06_auth_api_static:
