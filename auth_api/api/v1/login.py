@@ -1,3 +1,4 @@
+import os
 from core.jwt_management import JWTHandler
 from core.login_history import log_user_login_action
 from db.db_alchemy import db

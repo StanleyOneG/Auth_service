@@ -24,6 +24,10 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_jwt_extended import jwt_required
 from gevent import monkey
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+from opentelemetry import trace
+from log_tracer import configure_tracer
 
 monkey.patch_all()
 
@@ -43,12 +47,22 @@ app = Flask(__name__)
 app.config.from_object(TestingConfig())
 api = Api(app)
 swagger = Swagger(app)
+FlaskInstrumentor().instrument_app(app)
+db.init_app(app)
+
+with app.app_context():
+    SQLAlchemyInstrumentor().instrument(engine=db.engine)
+
+tracer = trace.get_tracer(__name__)
+configure_tracer()
+
+app.config['ENABLE_TRACER'] = True
+
 
 app.register_error_handler(HTTPException, handle_exception)
 
 migrate = Migrate(app, db)
 
-db.init_app(app)
 jwt.init_app(app)
 
 app.register_blueprint(superuser_bp)

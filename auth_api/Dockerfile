@@ -6,7 +6,8 @@ ENV \
     PYTHONUNBUFFERED=1
 
 RUN mkdir -p /auth_api
-COPY ./ /auth_api
+# COPY ./ /auth_api
+COPY ./requirements.txt /auth_api 
 RUN \
     pip install --upgrade wheel \
     && python3 -m pip install --upgrade pip \
@@ -20,4 +21,5 @@ ENV FLASK_APP="main"
 CMD \
     python -m flask db upgrade \
     && python -m flask create_superuser \
-    && gunicorn main:app -w 2 -b 0.0.0.0:8000 
+    # && gunicorn main:app -w 2 -b 0.0.0.0:8000 
+    && python main.py
