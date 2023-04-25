@@ -1,4 +1,3 @@
-from http import HTTPStatus
 from api.v1.change_credentials import ChangeUserCredentials
 from api.v1.login import UserLogIn
 from api.v1.logout import UserLogOut
@@ -20,9 +19,8 @@ from core.exception_handler import handle_exception
 from core.jwt_management import jwt
 from db.db_alchemy import db
 from flasgger import Swagger
-from flask import Flask
+from flask import Flask, request
 from flask_migrate import Migrate
-from flask_jwt_extended import jwt_required
 from gevent import monkey
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
@@ -36,7 +34,7 @@ import logging
 from core.config import SERVER_HOST, SERVER_PORT, SERVER_DEBUG
 
 # from commands import superuser_bp
-from flask_restful import Api, Resource
+from flask_restful import Api
 from core.app_config import TestingConfig, ProductionConfig
 from werkzeug.exceptions import HTTPException
 
@@ -44,11 +42,21 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+
+@app.before_request
+def before_request():
+    request_id = request.headers.get('X-Request-ID')
+    if not request_id:
+        raise RuntimeError('request id is required')
+
+
 app.config.from_object(TestingConfig())
 api = Api(app)
 swagger = Swagger(app)
-FlaskInstrumentor().instrument_app(app)
 db.init_app(app)
+jwt.init_app(app)
+FlaskInstrumentor().instrument_app(app)
 
 with app.app_context():
     SQLAlchemyInstrumentor().instrument(engine=db.engine)
@@ -56,27 +64,15 @@ with app.app_context():
 tracer = trace.get_tracer(__name__)
 configure_tracer()
 
-app.config['ENABLE_TRACER'] = True
-
-
 app.register_error_handler(HTTPException, handle_exception)
 
 migrate = Migrate(app, db)
 
-jwt.init_app(app)
 
 app.register_blueprint(superuser_bp)
 app.cli.add_command(create_superuser, name="create_superuser")
 
 
-class TestHelloWorld(Resource):
-    @jwt_required()
-    def get(self):
-        # return {'message': 'Hello, World!'}
-        raise HTTPStatus.BAD_REQUEST
-
-
-api.add_resource(TestHelloWorld, '/api/hello')
 api.add_resource(UserSignUp, '/api/v1/user/register')
 api.add_resource(UserLogIn, '/api/v1/user/login')
 api.add_resource(Refresh, '/api/v1/user/refresh')

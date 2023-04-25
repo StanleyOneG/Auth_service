@@ -1,10 +1,11 @@
 import os
 from datetime import timedelta
+from flask import current_app as app, request
 
-from .config import (
+from core.config import (
     DB_URI,
     REDIS_ACCESS_TOKEN_EXPIRE,
-    REDIS_REFRESH_TOKEN_EXPIRE
+    REDIS_REFRESH_TOKEN_EXPIRE,
 )
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -26,7 +27,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = DB_URI
     JWT_TOKEN_LOCATION = [
         "cookies",
-        ]
+    ]
     SECRET_KEY = os.urandom(32)
     JWT_ALGORITHM = "RS256"
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
@@ -46,7 +47,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = DB_URI
     JWT_TOKEN_LOCATION = [
         "cookies",
-        ]
+    ]
     SECRET_KEY = os.urandom(32)
     JWT_ALGORITHM = "RS256"
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
