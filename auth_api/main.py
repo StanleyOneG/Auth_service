@@ -25,7 +25,7 @@ from gevent import monkey
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry import trace
-from log_tracer import configure_tracer
+from core.log_tracer import configure_tracer
 
 monkey.patch_all()
 
@@ -33,7 +33,6 @@ import logging
 
 from core.config import SERVER_HOST, SERVER_PORT, SERVER_DEBUG
 
-# from commands import superuser_bp
 from flask_restful import Api
 from core.app_config import TestingConfig, ProductionConfig
 from werkzeug.exceptions import HTTPException
@@ -56,13 +55,14 @@ api = Api(app)
 swagger = Swagger(app)
 db.init_app(app)
 jwt.init_app(app)
+
+tracer = trace.get_tracer(__name__)
+configure_tracer()
+
 FlaskInstrumentor().instrument_app(app)
 
 with app.app_context():
     SQLAlchemyInstrumentor().instrument(engine=db.engine)
-
-tracer = trace.get_tracer(__name__)
-configure_tracer()
 
 app.register_error_handler(HTTPException, handle_exception)
 

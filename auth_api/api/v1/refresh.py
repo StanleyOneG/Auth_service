@@ -1,12 +1,11 @@
+from core.jwt_management import JWTHandler
 from flask import jsonify
 from flask_jwt_extended import (
+    get_current_user,
     jwt_required,
     set_access_cookies,
     set_refresh_cookies,
-    unset_jwt_cookies,
-    get_current_user,
 )
-from core.jwt_management import JWTHandler
 from flask_restful import Resource
 
 

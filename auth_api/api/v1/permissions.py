@@ -1,12 +1,13 @@
-from flask import Flask, request, Blueprint, jsonify
 import logging
-from flask_restful import Resource, reqparse
 import uuid
-from flask_jwt_extended import jwt_required, get_jwt
 from http import HTTPStatus
 
-from models.db_models import User, Permission, UserPermission
+from core.log_tracer import trace_this
 from db.db_alchemy import db
+from flask import jsonify
+from flask_jwt_extended import get_jwt, jwt_required
+from flask_restful import Resource, reqparse
+from models.db_models import Permission, User, UserPermission
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ class CreatePermission(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('permission', type=str, required=True, location='form')
 
+    @trace_this
     @jwt_required()
     def post(self):
         """
@@ -50,7 +52,9 @@ class CreatePermission(Resource):
             response = {'message': 'You are not allowed to do this'}
             return response, HTTPStatus.FORBIDDEN
         permission = self.parser.parse_args()['permission']
-        permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
+        permission_in_db = (
+            db.session.query(Permission).filter_by(name=permission).first()
+        )
         if permission_in_db:
             response = {'message': 'Permission already exists'}
             return response, HTTPStatus.NOT_FOUND
@@ -67,6 +71,7 @@ class DeletePermission(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('permission', type=str, required=True, location='form')
 
+    @trace_this
     @jwt_required()
     def delete(self):
         """
@@ -95,13 +100,19 @@ class DeletePermission(Resource):
             response = {'message': 'You are not allowed to do this'}
             return response, HTTPStatus.FORBIDDEN
         permission = self.parser.parse_args()['permission']
-        permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
+        permission_in_db = (
+            db.session.query(Permission).filter_by(name=permission).first()
+        )
         if not permission_in_db:
             response = {'message': 'Permission does not exists'}
             return response, HTTPStatus.NOT_FOUND
 
         # Remove the permission from the user_permission table
-        user_permission_list = db.session.query(UserPermission).filter_by(permission_id=permission_in_db.id).all()
+        user_permission_list = (
+            db.session.query(UserPermission)
+            .filter_by(permission_id=permission_in_db.id)
+            .all()
+        )
         for user_permission in user_permission_list:
             db.session.delete(user_permission)
 
@@ -120,6 +131,7 @@ class SetUserPermission(Resource):
     parser.add_argument('permission', type=str, required=True, location='form')
     parser.add_argument('user_login', type=str, required=True, location='form')
 
+    @trace_this
     @jwt_required()
     def post(self):
         """
@@ -153,7 +165,9 @@ class SetUserPermission(Resource):
             return response, HTTPStatus.FORBIDDEN
         permission = self.parser.parse_args()['permission']
         user_login = self.parser.parse_args()['user_login']
-        permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
+        permission_in_db = (
+            db.session.query(Permission).filter_by(name=permission).first()
+        )
         user_in_db = db.session.query(User).filter_by(login=user_login).first()
         if not permission_in_db:
             response = {'message': 'Permission does not exists'}
@@ -161,8 +175,13 @@ class SetUserPermission(Resource):
         if not user_in_db:
             response = {'message': 'User does not exists'}
             return response, HTTPStatus.NOT_FOUND
-        user_permission = db.session.query(UserPermission).filter_by(permission_id=permission_in_db.id,
-                                                                     user_id=user_in_db.id).first()
+        user_permission = (
+            db.session.query(UserPermission)
+            .filter_by(
+                permission_id=permission_in_db.id, user_id=user_in_db.id
+            )
+            .first()
+        )
         if user_permission:
             response = {'message': 'User already has the specified permission'}
             return response, HTTPStatus.NOT_FOUND
@@ -214,7 +233,9 @@ class DeleteUserPermission(Resource):
             return response, HTTPStatus.FORBIDDEN
         permission = self.parser.parse_args()['permission']
         user_login = self.parser.parse_args()['user_login']
-        permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
+        permission_in_db = (
+            db.session.query(Permission).filter_by(name=permission).first()
+        )
         user_in_db = db.session.query(User).filter_by(login=user_login).first()
         if not permission_in_db:
             response = {'message': 'Permission does not exist'}
@@ -222,10 +243,17 @@ class DeleteUserPermission(Resource):
         if not user_in_db:
             response = {'message': 'User does not exist'}
             return response, HTTPStatus.NOT_FOUND
-        user_permission = db.session.query(UserPermission).filter_by(permission_id=permission_in_db.id,
-                                                                     user_id=user_in_db.id).first()
+        user_permission = (
+            db.session.query(UserPermission)
+            .filter_by(
+                permission_id=permission_in_db.id, user_id=user_in_db.id
+            )
+            .first()
+        )
         if not user_permission:
-            response = {'message': 'User does not have the specified permission'}
+            response = {
+                'message': 'User does not have the specified permission'
+            }
             return response, HTTPStatus.NOT_FOUND
         db.session.delete(user_permission)
         db.session.commit()
@@ -235,9 +263,14 @@ class DeleteUserPermission(Resource):
 
 class ChangePermission(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('old_permission', type=str, required=True, location='form')
-    parser.add_argument('new_permission', type=str, required=True, location='form')
+    parser.add_argument(
+        'old_permission', type=str, required=True, location='form'
+    )
+    parser.add_argument(
+        'new_permission', type=str, required=True, location='form'
+    )
 
+    @trace_this
     @jwt_required()
     def patch(self):
         """
@@ -272,7 +305,9 @@ class ChangePermission(Resource):
         permission = self.parser.parse_args()['old_permission']
         new_permission = self.parser.parse_args()['new_permission']
 
-        permission_in_db = db.session.query(Permission).filter_by(name=permission).first()
+        permission_in_db = (
+            db.session.query(Permission).filter_by(name=permission).first()
+        )
         if not permission_in_db:
             response = {'message': 'Permission does not exist'}
             return response, HTTPStatus.NOT_FOUND
@@ -325,7 +360,9 @@ class ShowUserPermissions(Resource):
 
         permissions = (
             db.session.query(Permission)
-            .join(UserPermission, UserPermission.permission_id == Permission.id)
+            .join(
+                UserPermission, UserPermission.permission_id == Permission.id
+            )
             .filter(UserPermission.user_id == user_id)
             .all()
         )

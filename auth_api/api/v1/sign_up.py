@@ -1,14 +1,15 @@
 import logging
 import uuid
+from http import HTTPStatus
 
 from core.jwt_management import JWTHandler
+from core.log_tracer import trace_this
 from core.login_history import log_user_login_action
 from db.db_alchemy import db
 from flask import jsonify
 from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 from flask_restful import Resource, reqparse
 from models.db_models import User
-from http import HTTPStatus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ class UserSignUp(Resource):
     parser.add_argument('password', type=str, required=True, location='form')
     parser.add_argument('login', type=str, required=True, location='form')
 
+    @trace_this
     @log_user_login_action
     def post(self):
         """

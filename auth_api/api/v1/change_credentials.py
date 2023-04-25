@@ -1,14 +1,15 @@
-from flask import jsonify
 from core.jwt_management import JWTHandler
+from core.log_tracer import trace_this
 from db.db_alchemy import db
-from flask_restful import Resource, reqparse
+from flask import jsonify
 from flask_jwt_extended import (
-    jwt_required,
     current_user,
+    jwt_required,
     set_access_cookies,
     set_refresh_cookies,
     unset_jwt_cookies,
 )
+from flask_restful import Resource, reqparse
 from models.db_models import User
 
 
@@ -17,6 +18,7 @@ class ChangeUserCredentials(Resource):
     parser.add_argument('password', type=str, required=False, location='form')
     parser.add_argument('login', type=str, required=False, location='form')
 
+    @trace_this
     @jwt_required(fresh=True)
     def put(self):
         """

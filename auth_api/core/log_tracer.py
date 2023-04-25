@@ -1,3 +1,4 @@
+from flask import request
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import (
@@ -6,6 +7,19 @@ from opentelemetry.sdk.trace.export import (
 )
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from functools import wraps
+
+
+def trace_this(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        tracer = trace.get_tracer(__name__)
+        request_id = request.headers.get('X-Request-Id')
+        with tracer.start_as_current_span(func.__name__) as span:
+            span.set_attribute('http.request_id', request_id)
+            return func(*args, **kwargs)
+
+    return wrapper
 
 
 def configure_tracer() -> None:

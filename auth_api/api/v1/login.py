@@ -1,12 +1,13 @@
-import os
+from http import HTTPStatus
+
 from core.jwt_management import JWTHandler
+from core.log_tracer import trace_this
 from core.login_history import log_user_login_action
 from db.db_alchemy import db
 from flask import jsonify
 from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 from flask_restful import Resource, reqparse
 from models.db_models import User
-from http import HTTPStatus
 
 
 class UserLogIn(Resource):
@@ -24,6 +25,7 @@ class UserLogIn(Resource):
         location='form',
     )
 
+    @trace_this
     @log_user_login_action
     def post(self):
         """
