@@ -25,6 +25,7 @@ services:
       - ./auth_api:/auth_api:ro
     expose:
       - 8000
+    tty: true
     container_name: sprint06_auth_api
 
   sprint06_auth_redis:

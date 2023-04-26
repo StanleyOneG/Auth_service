@@ -6,10 +6,12 @@ from flask import jsonify, request
 from flask_jwt_extended import current_user, jwt_required
 from flask_restful import Resource
 from models.db_models import UserLoginHistory
+from core.rate_limiter import rate_limit
 
 
 class ShowUserLogInHistory(Resource):
     @trace_this
+    @rate_limit(limit=5, per=15)
     @jwt_required(fresh=True)
     def get(self):
         """

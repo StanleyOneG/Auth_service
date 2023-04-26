@@ -7,7 +7,7 @@ ENV \
 
 RUN mkdir -p /auth_api
 # COPY ./ /auth_api
-COPY ./requirements.txt /auth_api 
+COPY ./requirements.txt /auth_api
 RUN \
     pip install --upgrade wheel \
     && python3 -m pip install --upgrade pip \

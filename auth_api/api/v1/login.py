@@ -8,6 +8,7 @@ from flask import jsonify
 from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 from flask_restful import Resource, reqparse
 from models.db_models import User
+from core.rate_limiter import rate_limit
 
 
 class UserLogIn(Resource):
@@ -26,6 +27,7 @@ class UserLogIn(Resource):
     )
 
     @trace_this
+    @rate_limit(limit=5, per=10)
     @log_user_login_action
     def post(self):
         """
