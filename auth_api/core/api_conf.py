@@ -3,7 +3,8 @@
 from dotenv import load_dotenv
 from pydantic import BaseSettings
 
-load_dotenv()
+# load_dotenv("auth_api/.env.dev")
+load_dotenv("auth_api/.env")
 
 
 def to_upper(value: str) -> str:
@@ -100,6 +101,38 @@ class ServerSettings(BaseSettings):
         alias_generator = to_upper
 
 
+class GoogleOAuth2Settings(BaseSettings):
+    """Configuration for OAuth Google service."""
+
+    client_id: str
+    client_secret: str
+    uri: str
+    token_uri: str
+    base_url: str
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'GOOGLE_AUTH_'
+        alias_generator = to_upper
+
+
+class MailOAuth2Settings(BaseSettings):
+    """Configuration for OAuth Mail.Ru service."""
+
+    client_id: str
+    client_secret: str
+    uri: str
+    token_uri: str
+    base_url: str
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'MAIL_AUTH_'
+        alias_generator = to_upper
+
+
 class Settings(BaseSettings):
     """Helper class for configuration access."""
 
@@ -109,3 +142,7 @@ class Settings(BaseSettings):
     postgres = PostgresSettings()
     superuser = SuperUserSettings()
     server = ServerSettings()
+    oauth = {
+        'google': GoogleOAuth2Settings(),
+        'mail': MailOAuth2Settings()
+    }
