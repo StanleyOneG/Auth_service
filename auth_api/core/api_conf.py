@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from pydantic import BaseSettings
 
 # load_dotenv("auth_api/.env.dev")
-load_dotenv("auth_api/.env")
+load_dotenv()
 
 
 def to_upper(value: str) -> str:
