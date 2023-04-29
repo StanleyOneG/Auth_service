@@ -82,9 +82,7 @@ class UserInfo(Base):
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
     age = Column(Integer)
-    user = relationship('User',
-                        back_populates='user_info',
-                        uselist=False)
+    user = relationship('User', back_populates='user_info', uselist=False)
 
 
 class Permission(Base):

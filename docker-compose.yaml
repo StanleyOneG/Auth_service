@@ -22,7 +22,7 @@ services:
         condition: service_healthy
     volumes:
       - sprint06_auth_api_static:/usr/local/lib/python3.10/site-packages/flasgger/ui3/static/
-      - ./auth_api:/auth_api:ro
+      - ./auth_api:/auth_api:rw
     expose:
       - 8000
     tty: true
