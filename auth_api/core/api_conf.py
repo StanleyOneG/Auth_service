@@ -100,6 +100,32 @@ class ServerSettings(BaseSettings):
         alias_generator = to_upper
 
 
+class GoogleSettings(BaseSettings):
+    """Configuration for google."""
+
+    client_id: str
+    client_secret: str
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'GOOGLE_'
+        alias_generator = to_upper
+
+
+class VKSettings(BaseSettings):
+    """Configuration for VK."""
+
+    client_id: str
+    client_secret: str
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'VK_'
+        alias_generator = to_upper
+
+
 class Settings(BaseSettings):
     """Helper class for configuration access."""
 
@@ -109,3 +135,5 @@ class Settings(BaseSettings):
     postgres = PostgresSettings()
     superuser = SuperUserSettings()
     server = ServerSettings()
+    google = GoogleSettings()
+    vk = VKSettings()

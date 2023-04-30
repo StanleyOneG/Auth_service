@@ -17,6 +17,7 @@ WORKDIR /auth_api
 
 EXPOSE 8000
 ENV FLASK_APP="main"
+ENV AUTHLIB_INSECURE_TRANSPORT=true
 
 CMD \
     python -m flask db upgrade \

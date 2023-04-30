@@ -1,3 +1,6 @@
+from gevent import monkey
+
+monkey.patch_all()
 from api.v1.change_credentials import ChangeUserCredentials
 from api.v1.login import UserLogIn
 from api.v1.logout import UserLogOut
@@ -21,13 +24,13 @@ from db.db_alchemy import db
 from flasgger import Swagger
 from flask import Flask, request
 from flask_migrate import Migrate
-from gevent import monkey
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry import trace
 from core.log_tracer import configure_tracer
 
-monkey.patch_all()
+from core.oauth import GoogleOauth, VKOauth, Callback, oauth
+
 
 import logging
 
@@ -55,6 +58,7 @@ api = Api(app)
 swagger = Swagger(app)
 db.init_app(app)
 jwt.init_app(app)
+oauth.init_app(app)
 
 tracer = trace.get_tracer(__name__)
 configure_tracer()
@@ -86,6 +90,9 @@ api.add_resource(ChangePermission, '/api/v1/permission/change_permission')
 api.add_resource(ShowUserPermissions, '/api/v1/user/show_user_permissions')
 api.add_resource(ShowPermissions, '/api/v1/permission/show_permissions')
 api.add_resource(DeleteUserPermission, '/api/v1/user/delete_user_permission')
+api.add_resource(GoogleOauth, '/api/v1/auth/google')
+api.add_resource(VKOauth, '/api/v1/auth/vk')
+api.add_resource(Callback, '/api/v1/callback')
 
 if __name__ == "__main__":
     app.run(debug=SERVER_DEBUG, host=SERVER_HOST, port=SERVER_PORT)

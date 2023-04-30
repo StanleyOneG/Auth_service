@@ -27,3 +27,9 @@ SUPERUSER_PASSWORD = configs.superuser.password
 SERVER_HOST = configs.server.host
 SERVER_PORT = configs.server.port
 SERVER_DEBUG = configs.server.debug
+
+GOOGLE_CLIENT_ID = configs.google.client_id
+GOOGLE_CLIENT_SECRET = configs.google.client_secret
+
+VK_CLIENT_ID = configs.vk.client_id
+VK_CLIENT_SECRET = configs.vk.client_secret
