@@ -58,6 +58,14 @@ SERVER_DEBUG=True # Использовать True только для тести
 # URL для доступа к API
 SERVICE_URL=http://sprint06_auth_tests_api_server:8000 
 
+# Параметры OAuth провайдеров
+GOOGLE_AUTH_NAME=#<имя провайдера oauth>
+GOOGLE_AUTH_CLIENT_ID=#<client_id провайдера>
+GOOGLE_AUTH_CLIENT_SECRET=#<client_secret провайдера>
+GOOGLE_AUTH_AUTHORIZE_URL=#<URL на стороне провайдера для аутентификации>
+GOOGLE_AUTH_ACCESS_TOKEN_URL=#URL на стороне провайдера для получения access_token>
+GOOGLE_AUTH_API_BASE_URL=#<URL на стороне провайдера для получения информации например, о пользователе>
+
 ```
 
 #  **Запуск приложения**

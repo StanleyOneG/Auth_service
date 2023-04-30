@@ -22,13 +22,13 @@ services:
         condition: service_healthy
     volumes:
       - sprint06_auth_api_static:/usr/local/lib/python3.10/site-packages/flasgger/ui3/static/
-      - ./auth_api:/auth_api:ro
-    tty: true
-    # expose:
-    #   - 8000
+      # - ./auth_api:/auth_api:ro
+    # tty: true
+    expose:
+      - 8000
     container_name: sprint06_auth_api
-    ports:
-      - 80:8000
+    # ports:
+    #   - 80:8000
 
   sprint06_auth_redis:
     image: redis:latest
@@ -38,18 +38,29 @@ services:
     command: >
       --save 60 1
 
-  # nginx:
-  #   image: nginx:1.23.3
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-  #     - sprint06_auth_api_static:/static:ro
-  #   depends_on:
-  #     - sprint06_auth_api
-  #   ports:
-  #     - 80:80
-  #   container_name: nginx
+  nginx:
+    image: nginx:1.23.3
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - sprint06_auth_api_static:/static:ro
+    depends_on:
+      - sprint06_auth_api
+    ports:
+      - 80:80
+    container_name: nginx
+
+  pgadmin4:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 7777:80
+    env_file:
+      - ./.env
+    hostname: pgadmin4
+    restart: always
+    tty: true
+    container_name: pgadmin
 
 volumes:
   sprint06_auth_pg01data:

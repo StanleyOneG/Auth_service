@@ -104,11 +104,13 @@ class ServerSettings(BaseSettings):
 class GoogleOAuth2Settings(BaseSettings):
     """Configuration for OAuth Google service."""
 
+    name: str = 'google'
     client_id: str
     client_secret: str
-    uri: str
-    token_uri: str
-    base_url: str
+    authorize_url: str
+    access_token_url: str
+    api_base_url: str
+    client_kwargs: dict = {'scope': 'email'}
 
     class Config:
         """Configuration class for correct env variables insertion."""
@@ -117,14 +119,10 @@ class GoogleOAuth2Settings(BaseSettings):
         alias_generator = to_upper
 
 
-class MailOAuth2Settings(BaseSettings):
+class MailOAuth2Settings(GoogleOAuth2Settings):
     """Configuration for OAuth Mail.Ru service."""
 
-    client_id: str
-    client_secret: str
-    uri: str
-    token_uri: str
-    base_url: str
+    name: str = 'mail'
 
     class Config:
         """Configuration class for correct env variables insertion."""
