@@ -28,26 +28,6 @@ oauth.register(**configs.oauth.get('vk').__dict__)
 
 
 class OAuthLogin(Resource):
-    """
-    OAuth аутентификация и регистрация пользователя
-    Запись в базу данных и выдача пары access token и refresh token
-    ---
-    parameters:
-        - in: Args
-        name: provider
-        type: string
-        required: true
-    tags:
-        - User
-    produces:
-        - application/json
-    security:
-        - JWT: []
-    responses:
-        200:
-        description: Пользователь успешно зарегистрирован
-    """
-
     parser = reqparse.RequestParser()
     parser.add_argument(
         "provider",
@@ -57,6 +37,26 @@ class OAuthLogin(Resource):
     )
 
     def get(self):
+        """
+        OAuth аутентификация и регистрация пользователя
+        Запись в базу данных и выдача пары access token и refresh token
+        ---
+        parameters:
+          - in: query
+            name: provider
+            type: string
+            required: true
+        tags:
+          - User
+        produces:
+          - application/json
+        security:
+          - JWT: []
+        responses:
+          200:
+            description: Пользователь успешно зарегистрирован
+        """
+
         data = self.parser.parse_args()
         provider = data["provider"]
         session['provider'] = provider
