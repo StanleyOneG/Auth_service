@@ -98,13 +98,13 @@ class OAuthCallback(Resource):
 
                 # make a POST request to the VK API's 'access_token' endpoint to retrieve the access token
                 params = {
-                    'client_id': '51628420',
-                    'client_secret': 'OaupCG4FFnPiDiDfDsqb',
+                    'client_id': configs.oauth.get('vk').client_id,
+                    'client_secret': configs.oauth.get('vk').client_secret,
                     'redirect_uri': url_for('oauthcallback', _external=True),
                     'code': code,
                 }
                 response = requests.post(
-                    'https://oauth.vk.com/access_token', params=params
+                    configs.oauth.get('vk').access_token_url, params=params
                 )
                 logger.info(f'Got token {response.json()} for provider vk')
             email = response.json().get('email')
