@@ -2,11 +2,14 @@ from http import HTTPStatus
 import secrets, uuid, string
 
 from flask_restful import Resource, reqparse, url_for
-from flask import session, jsonify
+from flask import request, session, jsonify
 from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 from authlib.integrations.flask_client import OAuth
 
 import logging
+
+import requests
+
 
 from models.db_models import User
 from core.jwt_management import JWTHandler
@@ -15,6 +18,7 @@ from core.config import configs
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 oauth = OAuth()
 oauth.register(**configs.oauth.get('google').__dict__)
@@ -51,55 +55,83 @@ class OAuthLogin(Resource):
         required=True,
         location='args',
     )
+
     def get(self):
         data = self.parser.parse_args()
         provider = data["provider"]
         session['provider'] = provider
         client = oauth.create_client(provider)
         redirect_url = url_for('oauthcallback', _external=True)
-        logger.info(f'Redirect URL after authorizing provider {provider} {redirect_url}')
+        logger.info(
+            f'Redirect URL after authorizing provider {provider} {redirect_url}'
+        )
         return client.authorize_redirect(redirect_url)
 
 
 class OAuthCallback(Resource):
     def get(self):
         provider = dict(session).get('provider')
+        logger.info(f'Got provider {provider}')
         if provider is None:
-            return {'msg': 'Unknown provider or not supported'}, HTTPStatus.BAD_REQUEST
-        client = oauth.create_client(provider)
-        token = client.authorize_access_token()
-        logger.info(f'Got token {token} for provider {provider}')
-        params = {
-            'access_token': token.get('access_token'),
-            'oauth_token': token.get('access_token') # yandex
-        }
-        me = client.get('',params=params).json()
-        logger.info(f'Got info about user {me} for provider {provider}')
-        if provider == 'yandex':
-            email = me['default_email']
-        else:
-            email = me['email']
-        login = email.split('@')[0]
-        # me['sub'] for Google, me['id'] for MailRu, Yandex if needed
+            return {
+                'msg': 'Unknown provider or not supported'
+            }, HTTPStatus.BAD_REQUEST
+        if provider != 'vk':
+            client = oauth.create_client(provider)
+            token = client.authorize_access_token()
+            logger.info(f'Got token {token} for provider {provider}')
+            params = {
+                'access_token': token.get('access_token'),
+                'oauth_token': token.get('access_token'),  # yandex
+            }
+            me = client.get('', params=params).json()
+            logger.info(f'Got info about user {me} for provider {provider}')
+            if provider == 'yandex':
+                email = me['default_email']
+            else:
+                email = me['email']
+            login = email.split('@')[0]
+            # me['sub'] for Google, me['id'] for MailRu, Yandex if needed
+        if provider == 'vk':
+            if 'code' in request.args:
+                code = request.args.get('code')
+
+                # make a POST request to the VK API's 'access_token' endpoint to retrieve the access token
+                params = {
+                    'client_id': '51628420',
+                    'client_secret': 'OaupCG4FFnPiDiDfDsqb',
+                    'redirect_uri': url_for('oauthcallback', _external=True),
+                    'code': code,
+                }
+                response = requests.post(
+                    'https://oauth.vk.com/access_token', params=params
+                )
+                logger.info(f'Got token {response.json()} for provider vk')
+            email = response.json().get('email')
+            login = email.split('@')[0]
         if email is None:
             response = {'message': 'Authentication failed. Empty user email'}
             return response, HTTPStatus.BAD_REQUEST
         user = db.session.query(User).filter_by(email=email).first()
         if not user:
             alphabet = string.ascii_letters + string.digits
-            password = ''.join(secrets.choice(alphabet) for i in range(20))  # for a 20-character password
+            password = ''.join(
+                secrets.choice(alphabet) for i in range(20)
+            )  # for a 20-character password
             user = User()
             user.id = uuid.uuid4()
             user.email = email
             user.login = login
             user.set_password(password)
             db.session.add(user)
-            
+
             access_token, refresh_token = JWTHandler.create_jwt_tokens(
                 user,
-        )
+            )
 
-            response = jsonify({'message': 'User sign up successfull'})
+            response = jsonify(
+                {'message': f'User {login} sign up successfull'}
+            )
             set_access_cookies(
                 response=response, encoded_access_token=access_token
             )
@@ -109,7 +141,7 @@ class OAuthCallback(Resource):
             db.session.commit()
             return response
         access_token, refresh_token = JWTHandler.create_login_tokens(user=user)
-        response = jsonify({'message': f'User logged in successfully'})
+        response = jsonify({'message': f'User {login} logged in successfully'})
         set_access_cookies(
             response=response,
             encoded_access_token=access_token,
