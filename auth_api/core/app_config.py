@@ -6,17 +6,12 @@ from core.config import (
     DB_URI,
     REDIS_ACCESS_TOKEN_EXPIRE,
     REDIS_REFRESH_TOKEN_EXPIRE,
-)
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
-
-private_key = rsa.generate_private_key(
-    public_exponent=65537,
-    key_size=2048,
-    backend=default_backend(),
+    JWT_PRIVATE_KEY,
+    JWT_PUBLIC_KEY,
 )
 
-public_key = private_key.public_key()
+private_key = JWT_PRIVATE_KEY
+public_key = JWT_PUBLIC_KEY
 
 
 class Config(object):
