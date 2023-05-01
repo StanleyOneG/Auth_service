@@ -131,6 +131,32 @@ class MailOAuth2Settings(GoogleOAuth2Settings):
         alias_generator = to_upper
 
 
+class YandexOAuth2Settings(GoogleOAuth2Settings):
+    """Configuration for OAuth Yandex service."""
+
+    name: str = 'yandex'
+    client_kwargs: dict = {'scope': 'login:email'}
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'YANDEX_AUTH_'
+        alias_generator = to_upper
+
+
+class VkOAuth2Settings(GoogleOAuth2Settings):
+    """Configuration for OAuth Yandex service."""
+
+    name: str = 'vk'
+    display: str = 'page'
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'VK_AUTH_'
+        alias_generator = to_upper
+
+
 class Settings(BaseSettings):
     """Helper class for configuration access."""
 
@@ -142,5 +168,7 @@ class Settings(BaseSettings):
     server = ServerSettings()
     oauth = {
         'google': GoogleOAuth2Settings(),
-        'mail': MailOAuth2Settings()
+        'mail': MailOAuth2Settings(),
+        'yandex': YandexOAuth2Settings(),
+        'vk': VkOAuth2Settings()
     }
