@@ -100,6 +100,19 @@ class ServerSettings(BaseSettings):
         alias_generator = to_upper
 
 
+class JwtSettings(BaseSettings):
+    """Configuration for jwt."""
+
+    public_key: str
+    private_key: str
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'JWT_'
+        alias_generator = to_upper
+
+
 class Settings(BaseSettings):
     """Helper class for configuration access."""
 
@@ -109,3 +122,4 @@ class Settings(BaseSettings):
     postgres = PostgresSettings()
     superuser = SuperUserSettings()
     server = ServerSettings()
+    jwt = JwtSettings()

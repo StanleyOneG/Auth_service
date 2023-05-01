@@ -48,7 +48,7 @@ services:
     depends_on:
       - sprint06_auth_api
     ports:
-      - 80:80
+      - 88:80
     container_name: nginx_auth
 
   jaeger:

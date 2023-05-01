@@ -27,3 +27,6 @@ SUPERUSER_PASSWORD = configs.superuser.password
 SERVER_HOST = configs.server.host
 SERVER_PORT = configs.server.port
 SERVER_DEBUG = configs.server.debug
+
+JWT_PRIVATE_KEY = configs.jwt.private_key
+JWT_PUBLIC_KEY = configs.jwt.public_key
