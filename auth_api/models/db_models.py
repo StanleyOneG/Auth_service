@@ -90,17 +90,6 @@ class Permission(Base):
     name = Column(Text, nullable=False, unique=True)
 
 
-def create_partition(target, connection, **kw) -> None:
-    connection.execute(
-        """CREATE TABLE IF NOT EXISTS "login_at_1" PARTITION OF auth.user_login_history FOR VALUES FROM ('2023-04-01') TO ('2023-05-01')"""
-    )
-    connection.execute(
-        """CREATE TABLE IF NOT EXISTS "login_at_2" PARTITION OF auth.user_login_history FOR VALUES FROM ('2023-05-02') TO ('2023-06-01')"""
-    )
-    connection.execute(
-        """CREATE TABLE IF NOT EXISTS "login_at_3" PARTITION OF auth.user_login_history FOR VALUES FROM ('2023-06-02') TO ('2023-07-01')"""
-    )
-
 
 class UserLoginHistory(Base):
     __tablename__ = 'user_login_history'
@@ -108,7 +97,6 @@ class UserLoginHistory(Base):
         UniqueConstraint('id', 'login_at', 'user_agent', name='uq_user_login_history_id_login_at_user_agent'),
         {
             'postgresql_partition_by': 'RANGE (login_at)',
-            'listeners': [('after_create', create_partition)],
         }
     )
     id = Column(UUID(as_uuid=True), primary_key=True)
@@ -123,6 +111,5 @@ class UserLoginHistory(Base):
     user_agent = Column(Text, nullable=False)
     user = relationship('User', back_populates='login_history')
 
-# Index('user_login_history_login_at_idx', UserLoginHistory.login_at)
 
 # Base.metadata.create_all(engine)

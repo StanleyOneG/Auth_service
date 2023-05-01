@@ -34,13 +34,20 @@ import logging
 from core.config import SERVER_HOST, SERVER_PORT, SERVER_DEBUG
 
 from flask_restful import Api
-from core.app_config import TestingConfig, ProductionConfig
+from core.app_config import TestingConfig
 from werkzeug.exceptions import HTTPException
+from migrations.partitions import create_partition
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+
+@app.before_first_request
+def before_first_request():
+    create_partition()
+    app.logger.info("<<< partition created >>>")
 
 
 @app.before_request
@@ -68,10 +75,8 @@ app.register_error_handler(HTTPException, handle_exception)
 
 migrate = Migrate(app, db)
 
-
 app.register_blueprint(superuser_bp)
 app.cli.add_command(create_superuser, name="create_superuser")
-
 
 api.add_resource(UserSignUp, '/api/v1/user/register')
 api.add_resource(UserLogIn, '/api/v1/user/login')
