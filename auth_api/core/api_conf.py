@@ -3,6 +3,7 @@
 from dotenv import load_dotenv
 from pydantic import BaseSettings
 
+# load_dotenv("auth_api/.env.dev")
 load_dotenv()
 
 
@@ -111,6 +112,62 @@ class JwtSettings(BaseSettings):
 
         env_prefix = 'JWT_'
         alias_generator = to_upper
+        
+        
+class GoogleOAuth2Settings(BaseSettings):
+    """Configuration for OAuth Google service."""
+
+    name: str = 'google'
+    client_id: str
+    client_secret: str
+    authorize_url: str
+    access_token_url: str
+    api_base_url: str
+    client_kwargs: dict = {'scope': 'email'}
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'GOOGLE_AUTH_'
+        alias_generator = to_upper
+
+
+class MailOAuth2Settings(GoogleOAuth2Settings):
+    """Configuration for OAuth Mail.Ru service."""
+
+    name: str = 'mail'
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'MAIL_AUTH_'
+        alias_generator = to_upper
+
+
+class YandexOAuth2Settings(GoogleOAuth2Settings):
+    """Configuration for OAuth Yandex service."""
+
+    name: str = 'yandex'
+    client_kwargs: dict = {'scope': 'login:email'}
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'YANDEX_AUTH_'
+        alias_generator = to_upper
+
+
+class VkOAuth2Settings(GoogleOAuth2Settings):
+    """Configuration for OAuth Yandex service."""
+
+    name: str = 'vk'
+    display: str = 'page'
+
+    class Config:
+        """Configuration class for correct env variables insertion."""
+
+        env_prefix = 'VK_AUTH_'
+        alias_generator = to_upper
 
 
 class Settings(BaseSettings):
@@ -123,3 +180,10 @@ class Settings(BaseSettings):
     superuser = SuperUserSettings()
     server = ServerSettings()
     jwt = JwtSettings()
+    oauth = {
+        'google': GoogleOAuth2Settings(),
+        'mail': MailOAuth2Settings(),
+        'yandex': YandexOAuth2Settings(),
+        'vk': VkOAuth2Settings()
+    }
+

@@ -24,11 +24,14 @@ services:
         condition: service_healthy
     volumes:
       - sprint06_auth_api_static:/usr/local/lib/python3.10/site-packages/flasgger/ui3/static/
-      - ./auth_api:/auth_api:rw
+      # - ./auth_api:/auth_api:ro
+    # tty: true
     expose:
       - 8000
     tty: true
     container_name: sprint06_auth_api
+    # ports:
+    #   - 80:8000
 
   sprint06_auth_redis:
     image: redis:latest
@@ -59,6 +62,17 @@ services:
       - 16686:16686
     container_name: jaeger
   
+
+  pgadmin4:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 7777:80
+    env_file:
+      - ./.env
+    hostname: pgadmin4
+    restart: always
+    tty: true
+    container_name: pgadmin
 
 volumes:
   sprint06_auth_pg01data:

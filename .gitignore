@@ -136,3 +136,7 @@ dmypy.json
 *poetry.lock
 .DS_Store
 .env
+.env.dev
+docker-compose.dev.yaml
+default.dev.conf
+nginx.dev.conf

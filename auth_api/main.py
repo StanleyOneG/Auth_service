@@ -1,3 +1,7 @@
+from gevent import monkey
+
+monkey.patch_all()
+
 from api.v1.change_credentials import ChangeUserCredentials
 from api.v1.login import UserLogIn
 from api.v1.logout import UserLogOut
@@ -9,7 +13,7 @@ from api.v1.permissions import (
     SetUserPermission,
     ShowPermissions,
     ShowUserPermissions,
-)
+)   
 from api.v1.refresh import Refresh
 from api.v1.show_login_history import ShowUserLogInHistory
 from api.v1.sign_up import UserSignUp
@@ -21,13 +25,10 @@ from db.db_alchemy import db
 from flasgger import Swagger
 from flask import Flask, request
 from flask_migrate import Migrate
-from gevent import monkey
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry import trace
 from core.log_tracer import configure_tracer
-
-monkey.patch_all()
 
 import logging
 
@@ -37,6 +38,9 @@ from flask_restful import Api
 from core.app_config import TestingConfig
 from werkzeug.exceptions import HTTPException
 from migrations.partitions import create_partition
+from flask import Flask
+from core.oauth import oauth, OAuthLogin, OAuthCallback
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,6 +74,7 @@ FlaskInstrumentor().instrument_app(app)
 
 with app.app_context():
     SQLAlchemyInstrumentor().instrument(engine=db.engine)
+oauth.init_app(app)
 
 app.register_error_handler(HTTPException, handle_exception)
 
@@ -91,6 +96,9 @@ api.add_resource(ChangePermission, '/api/v1/permission/change_permission')
 api.add_resource(ShowUserPermissions, '/api/v1/user/show_user_permissions')
 api.add_resource(ShowPermissions, '/api/v1/permission/show_permissions')
 api.add_resource(DeleteUserPermission, '/api/v1/user/delete_user_permission')
+api.add_resource(OAuthLogin, '/api/v1/auth')
+api.add_resource(OAuthCallback, '/api/v1/callback')
+
 
 if __name__ == "__main__":
     app.run(debug=SERVER_DEBUG, host=SERVER_HOST, port=SERVER_PORT)
