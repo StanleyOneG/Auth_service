@@ -1,7 +1,7 @@
 #  **Ссылка на репозиторий** https://github.com/VladIs10ve/Auth_sprint_1
 
 
-#  **Ссылка на репозиторий Async_API**https://github.com/VladIs10ve/Async_API_sprint_1_team
+#  **Ссылка на репозиторий Async_API** https://github.com/VladIs10ve/Async_API_sprint_1_team
 
 Для интеграции сервисов используется jwt token и общий public_key
 
