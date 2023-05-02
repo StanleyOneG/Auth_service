@@ -94,7 +94,7 @@ class OAuthCallback(Resource):
             }
             me = client.get('', params=params).json()
             logger.info(f'Got info about user {me} for provider {provider}')
-            if provider == 'yandex':
+            if provider == OAuthProviders.yandex.name:
                 email = me['default_email']
             else:
                 email = me['email']
