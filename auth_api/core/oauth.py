@@ -29,10 +29,10 @@ oauth.register(**configs.oauth.get('vk').__dict__)
 
 
 class OAuthProviders(Enum):
-    GOOGLE = 'google'
-    MAIL = 'mail'
-    VK = 'vk'
-    MAILRU = 'mail'
+    google = 'google'
+    mail = 'mail'
+    vk = 'vk'
+    yandex = 'yandex'
 
 
 class OAuthLogin(Resource):
@@ -79,12 +79,12 @@ class OAuthLogin(Resource):
 class OAuthCallback(Resource):
     def get(self):
         provider = dict(session).get('provider')
-        logger.info(f'Got provider {provider}')
         if provider is None:
             return {
                 'msg': 'Unknown provider or not supported'
             }, HTTPStatus.BAD_REQUEST
-        if provider != OAuthProviders.VK:
+        if provider != OAuthProviders.vk.name:
+            logger.info('NOT FROM VK')
             client = oauth.create_client(provider)
             token = client.authorize_access_token()
             logger.info(f'Got token {token} for provider {provider}')
@@ -100,9 +100,10 @@ class OAuthCallback(Resource):
                 email = me['email']
             login = email.split('@')[0]
             # me['sub'] for Google, me['id'] for MailRu, Yandex if needed
-        if provider == OAuthProviders.VK:
+        if provider == OAuthProviders.vk.name:
             if 'code' in request.args:
                 code = request.args.get('code')
+                logger.info(f'Got code {code} for provider vk')
 
                 # make a POST request to the VK API's 'access_token' endpoint to retrieve the access token
                 params = {
@@ -111,6 +112,7 @@ class OAuthCallback(Resource):
                     'redirect_uri': url_for('oauthcallback', _external=True),
                     'code': code,
                 }
+                logger.info('PARAMS ==== %s', params)
                 response = requests.post(
                     configs.oauth.get('vk').access_token_url, params=params
                 )

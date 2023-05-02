@@ -138,5 +138,6 @@ dmypy.json
 .env
 .env.dev
 docker-compose.dev.yaml
+Dockerfile.dev
 default.dev.conf
 nginx.dev.conf

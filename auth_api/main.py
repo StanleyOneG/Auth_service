@@ -13,7 +13,7 @@ from api.v1.permissions import (
     SetUserPermission,
     ShowPermissions,
     ShowUserPermissions,
-)   
+)
 from api.v1.refresh import Refresh
 from api.v1.show_login_history import ShowUserLogInHistory
 from api.v1.sign_up import UserSignUp
@@ -32,7 +32,12 @@ from core.log_tracer import configure_tracer
 
 import logging
 
-from core.config import SERVER_HOST, SERVER_PORT, SERVER_DEBUG
+from core.config import (
+    SERVER_HOST,
+    SERVER_PORT,
+    SERVER_DEBUG,
+    SERVER_TELEMETRY,
+)
 
 from flask_restful import Api
 from core.app_config import TestingConfig
@@ -54,21 +59,22 @@ def before_first_request():
     app.logger.info("<<< partition created >>>")
 
 
-@app.before_request
-def before_request():
-    request_id = request.headers.get('X-Request-ID')
-    if not request_id:
-        raise RuntimeError('request id is required')
-
-
 app.config.from_object(TestingConfig())
 api = Api(app)
 swagger = Swagger(app)
 db.init_app(app)
 jwt.init_app(app)
 
-tracer = trace.get_tracer(__name__)
-configure_tracer()
+if SERVER_TELEMETRY:
+
+    @app.before_request
+    def before_request():
+        request_id = request.headers.get('X-Request-ID')
+        if not request_id:
+            raise RuntimeError('request id is required')
+
+    tracer = trace.get_tracer(__name__)
+    configure_tracer()
 
 FlaskInstrumentor().instrument_app(app)
 

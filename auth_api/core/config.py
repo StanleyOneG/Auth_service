@@ -1,3 +1,4 @@
+from flask import config
 from core.api_conf import Settings
 
 configs = Settings()
@@ -27,6 +28,7 @@ SUPERUSER_PASSWORD = configs.superuser.password
 SERVER_HOST = configs.server.host
 SERVER_PORT = configs.server.port
 SERVER_DEBUG = configs.server.debug
+SERVER_TELEMETRY = configs.server.telemetry
 
 JWT_PRIVATE_KEY = configs.jwt.private_key
 JWT_PUBLIC_KEY = configs.jwt.public_key

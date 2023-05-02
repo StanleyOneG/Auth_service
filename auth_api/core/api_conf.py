@@ -93,6 +93,7 @@ class ServerSettings(BaseSettings):
     host: str
     port: int
     debug: bool
+    telemetry: bool
 
     class Config:
         """Configuration class for correct env variables insertion."""
@@ -112,8 +113,8 @@ class JwtSettings(BaseSettings):
 
         env_prefix = 'JWT_'
         alias_generator = to_upper
-        
-        
+
+
 class GoogleOAuth2Settings(BaseSettings):
     """Configuration for OAuth Google service."""
 
@@ -184,6 +185,5 @@ class Settings(BaseSettings):
         'google': GoogleOAuth2Settings(),
         'mail': MailOAuth2Settings(),
         'yandex': YandexOAuth2Settings(),
-        'vk': VkOAuth2Settings()
+        'vk': VkOAuth2Settings(),
     }
-
