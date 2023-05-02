@@ -6,6 +6,7 @@ from flask_restful import Resource, reqparse, url_for
 from flask import request, session, jsonify
 from flask_jwt_extended import set_access_cookies, set_refresh_cookies
 from authlib.integrations.flask_client import OAuth
+from core.login_history import log_user_login_action
 
 import logging
 
@@ -77,6 +78,7 @@ class OAuthLogin(Resource):
 
 
 class OAuthCallback(Resource):
+    @log_user_login_action(oauth=True)
     def get(self):
         provider = dict(session).get('provider')
         if provider is None:
@@ -84,7 +86,6 @@ class OAuthCallback(Resource):
                 'msg': 'Unknown provider or not supported'
             }, HTTPStatus.BAD_REQUEST
         if provider != OAuthProviders.vk.name:
-            logger.info('NOT FROM VK')
             client = oauth.create_client(provider)
             token = client.authorize_access_token()
             logger.info(f'Got token {token} for provider {provider}')
@@ -112,7 +113,6 @@ class OAuthCallback(Resource):
                     'redirect_uri': url_for('oauthcallback', _external=True),
                     'code': code,
                 }
-                logger.info('PARAMS ==== %s', params)
                 response = requests.post(
                     configs.oauth.get('vk').access_token_url, params=params
                 )
@@ -140,7 +140,7 @@ class OAuthCallback(Resource):
             )
 
             response = jsonify(
-                {'message': f'User {login} sign up successfull'}
+                {'message': f'User {email} sign up successfull'}
             )
             set_access_cookies(
                 response=response, encoded_access_token=access_token
@@ -151,7 +151,7 @@ class OAuthCallback(Resource):
             db.session.commit()
             return response
         access_token, refresh_token = JWTHandler.create_login_tokens(user=user)
-        response = jsonify({'message': f'User {login} logged in successfully'})
+        response = jsonify({'message': f'User {email} logged in successfully'})
         set_access_cookies(
             response=response,
             encoded_access_token=access_token,
@@ -160,5 +160,8 @@ class OAuthCallback(Resource):
             response=response,
             encoded_refresh_token=refresh_token,
         )
+
+        # set email for history logging decorator
+        session['email'] = email
 
         return response
