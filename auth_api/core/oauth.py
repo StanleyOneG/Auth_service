@@ -1,5 +1,6 @@
 from http import HTTPStatus
 import secrets, uuid, string
+from enum import Enum
 
 from flask_restful import Resource, reqparse, url_for
 from flask import request, session, jsonify
@@ -25,6 +26,13 @@ oauth.register(**configs.oauth.get('google').__dict__)
 oauth.register(**configs.oauth.get('mail').__dict__)
 oauth.register(**configs.oauth.get('yandex').__dict__)
 oauth.register(**configs.oauth.get('vk').__dict__)
+
+
+class OAuthProviders(Enum):
+    GOOGLE = 'google'
+    MAIL = 'mail'
+    VK = 'vk'
+    MAILRU = 'mail'
 
 
 class OAuthLogin(Resource):
@@ -76,7 +84,7 @@ class OAuthCallback(Resource):
             return {
                 'msg': 'Unknown provider or not supported'
             }, HTTPStatus.BAD_REQUEST
-        if provider != 'vk':
+        if provider != OAuthProviders.VK:
             client = oauth.create_client(provider)
             token = client.authorize_access_token()
             logger.info(f'Got token {token} for provider {provider}')
@@ -92,7 +100,7 @@ class OAuthCallback(Resource):
                 email = me['email']
             login = email.split('@')[0]
             # me['sub'] for Google, me['id'] for MailRu, Yandex if needed
-        if provider == 'vk':
+        if provider == OAuthProviders.VK:
             if 'code' in request.args:
                 code = request.args.get('code')
 
