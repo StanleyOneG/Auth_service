@@ -59,6 +59,7 @@ SUPERUSER_PASSWORD=#<Пароль суперпользователя>
 SERVER_HOST=sprint06_auth_tests_api_server # название Докер контейнера с Auth API
 SERVER_PORT=8000
 SERVER_DEBUG=True # Использовать True только для тестирования
+SERVER_TELEMETRY=False
 
 # URL для доступа к API
 SERVICE_URL=http://sprint06_auth_tests_api_server:8000 
